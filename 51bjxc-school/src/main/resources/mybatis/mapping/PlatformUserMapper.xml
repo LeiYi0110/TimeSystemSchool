@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.PlatformUserMapper">
+	<select id="list" resultType="com.bjxc.school.PlatformUser">
+		select p.id,p.insId,p.StationId,p.mobile,p.userName,p.status,p.urole,p.email,te.name as Area,s.`Name` as stationName
+			from tplatformuser p left join TServiceStation s  on p.StationId=s.ID 
+			left join tteacharea te on te.id=p.areaId
+			<where>
+				<if test="insId != null">
+					and p.insId=#{insId} 
+				</if>
+				<if test="stationId != null">
+					and p.stationId = #{stationId}
+				</if>
+				<if test="searchText != null">
+					and p.userName like CONCAT(CONCAT('%',#{searchText}), '%')
+				</if>
+			</where>
+			order by p.CreateTime limit #{start},#{size}
+	</select>
+	
+	<select id="countUser" resultType="java.lang.Integer">
+		select count(1) from tplatformuser 
+		<where>
+			<if test="insId != null">
+				and insId=#{insId} 
+			</if>
+			<if test="stationId != null">
+				and stationId = #{stationId}
+			</if>
+			<if test="searchText != null">
+				and userName like CONCAT(CONCAT('%',#{searchText}), '%')
+			</if>
+		</where>
+	</select>
+	
+	<update id="update" parameterType="com.bjxc.school.PlatformUser">
+		update TPlatformUser
+		<set>
+			<if test="stationId!=null">
+				stationId=#{stationId}, 
+			</if>
+			<if test="mobile!=null">
+				mobile=#{mobile}, 
+			</if>
+			<if test="userName!=null">
+				userName=#{userName}, 
+			</if>
+			<if test="password!=null">
+				password=#{password}, 
+			</if>
+			<if test="urole!=null">
+				urole=#{urole}, 
+			</if>
+			<if test="headImg!=null">
+				Headimg=#{headImg},
+			</if>
+			<if test="areaId!=null">
+				areaId=#{areaId},
+			</if>
+			<if test="drivingfiledId!=null">
+				drivingfiledId=#{drivingfiledId}
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	<select id="platformUserList" resultType="com.bjxc.school.PlatformUser">
+		select p.id,p.insId,p.StationId,p.mobile,p.userName,p.status,p.urole,p.email,s.Area,s.`Name` as stationName
+			from tplatformuser p left join TServiceStation s  on p.StationId=s.ID 
+	</select>
+	<update id="updatePassword" parameterType="com.bjxc.school.PlatformUser">
+		update TPlatformUser
+		<set>
+			<if test="mobile!=null">
+				mobile=#{mobile}, 
+			</if>
+			<if test="userName!=null">
+				userName=#{userName}, 
+			</if>
+			<if test="password!=null">
+				password=#{password}, 
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	<!-- 修改密码 -->
+	<update id="updatepwd" parameterType="com.bjxc.school.PlatformUser">
+	   update tplatformuser    
+	   <set>
+	     <if test="password!=null">
+				password=#{password}, 
+			</if>
+	      <if test="mobile!=null">
+				mobile=#{mobile}
+		  </if>
+	   </set>
+		where id=#{id}
+	</update>
+	
+	<insert id="insert"  parameterType="com.bjxc.school.PlatformUser" useGeneratedKeys="true" keyProperty="id">
+		insert into tplatformuser
+		(insId,stationId,mobile,password,userName,status,urole,createtime,Headimg,areaId,DrivingfiledId) 
+		value
+		(#{insId},#{stationId},#{mobile},#{password},#{userName},1,#{urole},now(),#{headImg},#{areaId},#{drivingfiledId})
+	</insert>
+</mapper>

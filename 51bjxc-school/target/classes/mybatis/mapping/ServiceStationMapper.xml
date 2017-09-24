@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.ServiceStationMapper">
+
+	<select id="list" resultType="com.bjxc.school.ServiceStation">
+		select ts.id,ts.insId,ts.address,ts.functionary,ts.contactMobile,ts.location,ts.status,ts.area,ts.NAME,ts.areaId,tt.name as areaname,st.*,tc.*
+		from tservicestation ts
+		left join (select stationId, count(*) as studentId from tstudent group by StationId) as st on ts.id = st.stationId
+		left join (select stationId, count(*) as coachId from tcoach inner join tcoachservice on tcoach.id = tcoachservice.CoachId group by StationId) as tc on ts.id = tc.stationId
+	  left join tteacharea tt on tt.id=ts.areaId
+		where ts.InsId = #{insId} and ts.Status=1
+		<if test="searchText != null">
+			and (Functionary like CONCAT(CONCAT('%',#{searchText}),
+			'%')
+			or ts.Name like CONCAT(CONCAT('%',#{searchText}), '%'))
+		</if>
+		limit #{start},#{size}
+	</select>
+
+	<select id="countStation" resultType="java.lang.Integer">
+	select count(1)
+		from tservicestation ts
+		left join (select stationId, count(*) as studentId from tstudent group by StationId) as st on ts.id = st.stationId
+		left join (select stationId, count(*) as coachId from tcoach inner join tcoachservice on tcoach.id = tcoachservice.CoachId group by StationId) as tc on ts.id = tc.stationId
+	    left join tteacharea tt on tt.id=ts.areaId
+		where ts.InsId = #{insId} and ts.Status=1
+		<if test="searchText != null">
+		and (Functionary like CONCAT(CONCAT('%',#{searchText}),
+			'%')
+			or ts.Name like CONCAT(CONCAT('%',#{searchText}), '%'))
+		</if>
+	</select>
+
+	<insert id="add" parameterType="com.bjxc.school.ServiceStation">
+		INSERT INTO `tservicestation`
+		(`InsId`, `Address`, `Functionary`, `ContactMobile`, `Name`,location,areaId,area)
+		VALUES (#{insId}, #{address}, #{functionary},#{contactMobile},#{name},#{location},#{areaId},#{area});
+	</insert>
+
+	<!-- 修改练车场地信息 -->
+	<update id="update" parameterType="com.bjxc.school.ServiceStation">
+		update tservicestation
+		<set>
+			<if test="address != null and address != ''">
+				Address = #{address},
+			</if>
+			<if test="functionary != null and functionary != ''">
+				Functionary = #{functionary},
+			</if>
+			<if test="contactMobile != null and contactMobile != ''">
+				ContactMobile = #{contactMobile},
+			</if>
+			<if test="name != null and name != ''">
+				Name = #{name},
+			</if>
+			<if test="area != null and area != ''">
+				Area = #{area},
+			</if>
+			<if test="location != null and location != ''">
+				location = #{location},
+			</if>
+				<if test="areaId != null and areaId != ''">
+				areaId = #{areaId},
+			</if>
+			<if test="area != null and area != ''">
+				area = #{area},
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	<delete id="delete" parameterType="java.lang.Integer">
+		delete from tservicestation where id=#{id}
+	</delete>
+	
+	<select id="dotdelete" parameterType="java.lang.Integer"  resultType="com.bjxc.school.ServiceStation">
+	select ts.id,ts.insId,ts.address,ts.functionary,ts.contactMobile,ts.location,ts.status,ts.area,ts.NAME,ts.areaId,tt.name as areaname,st.*,tc.*
+		from tservicestation ts
+		left join (select stationId, count(*) as studentId from tstudent group by StationId) as st on ts.id = st.stationId
+		left join (select stationId, count(*) as coachId from tcoach inner join tcoachservice on tcoach.id = tcoachservice.CoachId group by StationId) as tc on ts.id = tc.stationId
+	    left join tteacharea tt on tt.id=ts.areaId
+		where  ts.id=#{id} and  ts.InsId = #{insId}
+	</select>
+</mapper>

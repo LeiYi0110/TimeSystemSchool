@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.TeachOutlineMapper">
+
+	<insert id="add" parameterType="com.bjxc.school.TeachOutline">
+		INSERT INTO `teachoutline` (`cartype`, `subjectId`, `courseNum`, `insId`) VALUES 
+		(#{cartype}, #{subjectId}, #{courseNum}, #{insId});
+	</insert>
+	
+	<insert id="addSubjectOne" parameterType="com.bjxc.school.TeachOutlineSubjectOne">
+		INSERT INTO `teachoutlinesubjectone` (`licenseAndUse`, `trafficRules`, `drivingBehavior`, `illegalPunishment`, `vehicleRegistration`, 
+		`trafficAccident`, `localRegulations`, `vehicleStructure`, `vehicleMainSafety`, `operatingMechanism`, `vehiclePerformance`, `inspectionMaintenance`, `vehicleMaterial`, `lawsRegulations`,`cartype`,`insId`) VALUES 
+		(#{licenseAndUse}, #{trafficRules}, #{drivingBehavior}, #{illegalPunishment}, #{vehicleRegistration}, #{trafficAccident}, #{localRegulations}, 
+		#{vehicleStructure}, #{vehicleMainSafety}, #{operatingMechanism}, #{vehiclePerformance}, #{inspectionMaintenance}, #{vehicleMaterial}, #{lawsRegulations},#{cartype},#{insId});
+	</insert>
+	
+	<insert id="addSubjectTwo" parameterType="com.bjxc.school.TeachOutlineSubjectTwo">
+		INSERT INTO `teachoutlinesubjecttwo` (`basistheoryKnowledge`, `drivingPosition`, `operationSpecification`, `inspectionAdjustment`, 
+		`boardingActions`, `checkUpFront`, `startStop`, `shiftAstern`, `positionRoute`, `drivingtheoryKnowledge`, `treasury`, `parkingStarted`, `sideParking`, `curve`, `rightAngleBend`, `drivingCityStreets`, `withCarDriving`, `independentDriving`, `basisDrivingField`,`cartype`,`insId`) 
+		VALUES (#{basistheoryKnowledge}, #{drivingPosition}, #{operationSpecification}, #{inspectionAdjustment}, #{boardingActions}, #{checkUpFront}, #{startStop}, #{shiftAstern}, #{positionRoute}, #{drivingtheoryKnowledge},
+		 #{treasury}, #{parkingStarted}, #{sideParking}, #{curve}, #{rightAngleBend}, #{drivingCityStreets}, #{withCarDriving}, #{independentDriving}, #{basisDrivingField},#{cartype},#{insId});
+	</insert>
+	
+	<insert id="addSubjectThree" parameterType="com.bjxc.school.TeachOutlineSubjectThree">
+		INSERT INTO `teachoutlinesubjectthree` (`carDrivingThree`, `changeLanes`, `pullOver`, `turnAround`, `intersection`, `pedestrianCrossing`, 
+		`schoolArea`, `busStop`, `passing`, `overtaking`, `drivingAtNight`, `badDriving`, `drivingAndTested`, `mountain`, `highwayDriving`, `routeChoice`,`cartype`,`insId`) 
+		VALUES (#{carDrivingThree}, #{changeLanes}, #{pullOver}, #{turnAround}, #{intersection}, #{pedestrianCrossing}, #{schoolArea},
+		 #{busStop}, #{passing}, #{overtaking}, #{drivingAtNight}, #{badDriving}, #{drivingAndTested}, #{mountain}, #{highwayDriving}, #{routeChoice},#{cartype},#{insId});
+	</insert>
+	
+	<insert id="addSubjectFour" parameterType="com.bjxc.school.TeachOutlineSubjectFour">
+		INSERT INTO `teachoutlinesubjectfour` (`civilizedDrivingKnow`, `hazardsDistinguishes`, `emergencyTreatment`, `dangerousChemicals`,
+		 `drivingSafetyKnow`, `caseAnalysis`, `reviewAssessment`, `badWeather`,`cartype`,`insId`) 
+		VALUES (#{civilizedDrivingKnow}, #{hazardsDistinguishes}, #{emergencyTreatment}, #{dangerousChemicals}, #{drivingSafetyKnow}, #{caseAnalysis},
+		 #{reviewAssessment}, #{badWeather},#{cartype},#{insId});
+	</insert>
+
+</mapper>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.ComplaintMapper">
+	
+	<select id="pageList" resultType="com.bjxc.school.Complaint">
+		select co.*,coa.Name as coachName,ins.Name as institutionName 
+			, st.name as studentName
+			, st.stunum as stunum
+			, st.idcard as idcard
+			,isValid
+			, (
+				select count(1) from tstudentreserveinfo ri
+				left join tstudentreserve sr on sr.id = ri.reserveid
+				where ri.status = 2 
+					and sr.studentid = st.id
+					and sr.studentid > 0
+					and sr.coachid = co.objectid
+					and sr.coachid > 0 
+					and co.type = 1
+				) as reserveCount
+			, ( 
+				select count(1) 
+				from tstudentreserveinfo ri
+					left join tstudentreserve sr on sr.id = ri.reserveid
+					left join tcoach tc on tc.id = sr.coachid
+				where ri.status = 2 
+					and sr.studentid = st.id
+					and sr.studentid > 0
+					and tc.insid = co.objectid
+					and co.type = 2
+				) as insReserveCount
+		from tcomplaint co 
+			left join TCoach coa on co.objectId = coa.id
+			left join TInstitution ins on co.objectId = ins.id
+			left join Tstudent st on st.id = co.studentid
+		<where>
+			<if test="type != null">
+				co.type=${type}
+			</if>
+			<if test="searchText != null and !searchText.equals(&quot;&quot;)">
+				and coa.name like CONCAT(CONCAT('%',#{searchText}), '%')
+			</if>
+			<if test="startTime != null">
+				and co.cdate &gt; #{startTime}
+			</if>
+			<if test="endTime != null">
+				and co.cdate &lt; #{endTime}
+			</if>
+			order by cdate desc
+		</where>
+		limit ${start},${size}
+	</select>
+	
+	<select id="pageListTotal" resultType="int">
+		select count(1)
+		from tcomplaint co 
+			left join TCoach coa on co.objectId = coa.id
+			left join TInstitution ins on co.objectId = ins.id
+			left join Tstudent st on st.id = co.studentid
+		<where>
+			<if test="type != null">
+				co.type=${type}
+			</if>
+			<if test="searchText!=null and !searchText.equals(&quot;&quot;)">
+				and coa.name like CONCAT(CONCAT('%',#{searchText}), '%')
+			</if>
+			<if test="startTime != null">
+				and co.cdate &gt; #{startTime}
+			</if>
+			<if test="endTime != null">
+				and co.cdate &lt; #{endTime}
+			</if>
+			order by cdate desc
+		</where>
+	</select>
+	
+	<select id="total" resultType="Integer">
+		select count(*) from tcomplaint co 
+		left join TCoach coa on co.objectId = coa.id
+		left join TInstitution ins on co.objectId = ins.id
+		<where>
+			co.type=1
+		</where>
+	</select>
+	
+	<!-- 添加数据 -->
+	<insert id="add" parameterType="com.bjxc.school.Complaint" useGeneratedKeys="true" keyProperty="id">
+		insert into
+		tcomplaint(StudentId,type,objectId,cdate,content,schopinion,isValid)
+		value(#{studentId},#{type},#{objectId},now(),#{content},#{schopinion},#{isValid})
+	</insert>
+	<!-- 处理投诉信息 -->
+	<update id="update" parameterType="com.bjxc.school.Complaint">
+		update tcomplaint
+		<set>
+			<if test="schopinion != null">
+                schopinion = #{schopinion},
+			</if>
+			<if test="depaopinion!=null">
+				depaopinion=#{depaopinion}
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	<select id="tcomplaintList" resultType="com.bjxc.school.Complaint">
+		select co.*,coa.Name as coachName,ins.Name as institutionName from tcomplaint co 
+		left join TCoach coa on co.objectId = coa.id
+		left join TInstitution ins on co.objectId = ins.id 
+		where co.type=#{type}
+	</select>
+	
+ 	<update id="udpatedriving"  parameterType="com.bjxc.school.Complaint">
+	 	update tcomplaint   set isProvince = #{isProvince} where id=#{id}
+	</update> 
+</mapper>

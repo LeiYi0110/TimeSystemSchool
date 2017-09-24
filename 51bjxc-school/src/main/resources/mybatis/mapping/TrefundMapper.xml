@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.TrefundMapper">
+	
+	<update id="updateTrefund" parameterType="com.bjxc.school.Trefund">
+		update trefund
+		<set>
+			<if test="status != null">
+				status=#{status},
+			</if>
+			<if test="reviewUser != null">
+				reviewUser=#{reviewUser},
+			</if>
+			<if test="userNote != null">
+				userNote=#{userNote}
+			</if>
+		</set>
+		  where id=#{id}
+	</update>
+	
+	<select id="getTrefund" resultType="com.bjxc.school.Trefund">
+		SELECT tf.id,tf.createtime,tf.money,tf.reviewUser,tf.studentID,tf.`status`,tf.userNote,tf.stuNote,st.stunum,
+		st.`Name` as studentName,st.Tuition,st.AlreadyPay,st.Arrearage,ty.classcurr,ts.`Name` as serviceStationName,tc.`Name` as tcoachName,sb.SubjectId
+		FROM
+		trefund AS tf
+		LEFT JOIN TStudent AS st ON tf.studentID=st.ID
+		LEFT JOIN TClassType AS ty ON ty.ID=st.ClassTypeId
+		LEFT JOIN tservicestation AS ts ON ts.ID=st.StationId
+		LEFT JOIN tstudentsubject AS sb ON sb.StudentId=st.ID
+		LEFT JOIN TCoach AS tc ON tc.ID=sb.CoachId
+		where 1=1
+		<if test="stationId != null">
+		and	stationId=#{stationId}
+		</if>
+		<if test="time1 != null">
+		and tf.createtime &gt;= #{time1}
+		</if>
+		<if test="time2 != null">
+		and tf.createtime &lt;= #{time2}
+		</if>
+		<if test="status != null">
+		and	tf.`status` = #{status}
+		</if>
+		<if test="insId != null">
+		and	st.InsId=#{insId}
+		</if>
+		limit ${start},${size}
+	</select>
+	
+	<select id="total" resultType="Integer">
+		SELECT count(*)
+		FROM
+		trefund AS tf
+		LEFT JOIN TStudent AS st ON tf.studentID=st.ID
+		LEFT JOIN TClassType AS ty ON ty.ID=st.ClassTypeId
+		LEFT JOIN tservicestation AS ts ON ts.ID=st.StationId
+		LEFT JOIN tstudentsubject AS sb ON sb.StudentId=st.ID
+		LEFT JOIN TCoach AS tc ON tc.ID=sb.CoachId
+		where 1=1
+		<if test="stationId !=null">
+		and studentID in(select ID from tstudent where StationId=#{stationId})
+		</if>
+		<if test="time1 != null">
+		and tf.createtime &gt;= #{time1}
+		</if>
+		<if test="time2 != null">
+		and tf.createtime &lt;= #{time2}
+		</if>
+		<if test="status != null">
+		and tf.`status` = #{status}
+		</if>
+		<if test="insId != null">
+		and	st.InsId=#{insId}
+		</if>
+	</select>
+</mapper>

@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.SchedulingTheoryMapper">
+	
+	<!-- 理论课上报 -->
+	<select id="reportList" resultType="com.bjxc.school.SchedulingTheory">
+		select sth.*,stu.name as studentName,stu.Mobile,stu.Idcard,
+			stu.recordnum,stu.Applydate,stu.InsId from SchedulingTheory sth
+			left join TStudent stu on stu.id=sth.StudentId
+		<where>
+			stu.recordnum is not null
+			<if test="stationId != null">
+				and sth.StationId=#{stationId}
+			</if>
+			and sth.SubjectId=0 and sth.Status=1
+		</where>
+		LIMIT #{start},#{size}
+	</select>
+	
+	
+	<select id="reportTotal" resultType="Integer">
+		select count(*) from SchedulingTheory sth
+			left join TStudent stu on stu.id=sth.StudentId
+		<where>
+			stu.recordnum is not null
+			<if test="stationId != null">
+				and sth.StationId=#{stationId}
+			</if>
+			and sth.SubjectId=0 and sth.Status=1
+		</where>
+	</select>
+	
+	<!-- 理论课排班-->
+	<select id="schedulingList" resultType="com.bjxc.school.SchedulingTheory">
+		select sth.*,stu.name as studentName,stu.Mobile,stu.Idcard,
+			stu.recordnum,stu.Applydate,stu.InsId from SchedulingTheory sth
+			left join TStudent stu on stu.id=sth.StudentId
+		<where>
+			stu.recordnum is not null
+			<if test="stationId != null">
+				and sth.StationId=#{stationId}
+			</if>
+			and sth.SubjectId=0 and sth.Status=2
+		</where>
+		LIMIT #{start},#{size}
+	</select>
+	
+	<select id="schedulingTotal" resultType="Integer">
+		select count(*) from SchedulingTheory sth
+			left join TStudent stu on stu.id=sth.StudentId
+		<where>
+			stu.recordnum is not null
+			<if test="stationId != null">
+				and sth.StationId=#{stationId}
+			</if>
+			and sth.SubjectId=0 and sth.Status=2
+		</where>
+	</select>
+	
+	<!-- 理论排班排班记录-->
+	<select id="recordList" resultType="com.bjxc.school.SchedulingTheory">
+		select sth.*,stu.name as studentName,stu.Mobile,stu.Idcard,
+			stu.recordnum,stu.Applydate,stu.InsId from SchedulingTheory sth
+			left join TStudent stu on stu.id=sth.StudentId
+		<where>
+			stu.recordnum is not null
+			<if test="stationId != null">
+				and sth.StationId=#{stationId}
+			</if>
+			<if test="classDate !=null">
+				and date_format(ClassDate,'%Y-%m-%d')=#{classDate}
+			</if>
+			and sth.SubjectId=0 and sth.Status=3  
+		</where>
+		LIMIT #{start},#{size}
+	</select>
+	
+	<select id="recordTotal" resultType="Integer">
+		select count(*) from SchedulingTheory sth
+			left join TStudent stu on stu.id=sth.StudentId
+		<where>
+			stu.recordnum is not null
+			<if test="stationId != null">
+				and sth.StationId=#{stationId}
+			</if>
+			<if test="classDate !=null">
+				and date_format(ClassDate,'%Y-%m-%d')=#{classDate}
+			</if>
+			and sth.SubjectId=0 and sth.Status=3
+		</where>
+	</select>
+    <!-- 理论课人数上报-->
+	<update id="theoryUpdate" parameterType="com.bjxc.school.SchedulingTheory">
+		update SchedulingTheory
+		<set>
+			status = 2
+		</set>
+		where id in 
+		<foreach item="rids" collection="array" open="(" separator=","
+			close=")">
+			#{rids}
+		</foreach>
+	</update>
+    <!-- 理论课排班-->
+	<update id="schedulingUpdate" parameterType="com.bjxc.school.SchedulingTheory">
+		update SchedulingTheory
+		<set>
+			status = 3,EndTime=now()
+		</set>
+		where id in
+		<foreach item="rids" collection="array" open="(" separator=","
+			close=")">
+			#{rids}
+		</foreach>
+	</update>
+	<!-- 理论课未上报人数-->
+	<update id="notReportedUpdate" parameterType="com.bjxc.school.SchedulingTheory">
+		update SchedulingTheory
+		<set>
+			status = 1
+		</set>
+		where id in 
+		<foreach item="rids" collection="array" open="(" separator=","
+			close=")">
+			#{rids}
+		</foreach>
+	</update>
+	<!-- 理论课排班上报日期、备注修改-->
+	<update id="update" parameterType="com.bjxc.school.SchedulingTheory">
+		update SchedulingTheory
+		<set>
+			<if test="classDate!=null">
+				ClassDate =#{classDate}
+			</if>
+			<if test="remarks !=null">
+				Remarks=#{remarks}
+			</if>
+		</set>
+		where id =(#{id})
+	</update>
+	<!-- 导出 -->
+	<select id="exporTrecordList" resultType="com.bjxc.school.SchedulingTheory">
+		select sth.*,stu.name as studentName,stu.Mobile,stu.Idcard,
+			stu.recordnum,stu.Applydate,stu.InsId from SchedulingTheory sth
+			left join TStudent stu on stu.id=sth.StudentId
+		<where>
+			stu.recordnum is not null
+			<if test="stationId != null">
+				and sth.StationId=#{stationId}
+			</if>
+			<if test="classDate !=null">
+				and date_format(ClassDate,'%Y-%m-%d')=#{classDate}
+			</if>
+			and sth.SubjectId=0 and sth.Status=3
+		</where>
+	</select>
+	
+	<select id="getScheTheoryList" resultType="com.bjxc.school.SchedulingTheory">
+		select sche.ClassDate,tser.`name` stationName,tstu.`name` stuName,tstu.Mobile stuMobile,tstu.Idcard stuIdCard,tstu.recordnum stuRecNum,sche.EndTime 
+		from SchedulingTheory sche left join tstudent tstu 
+		on sche.StudentId=tstu.id left join 
+		tservicestation tser on sche.StationId =tser.id 
+		left join tteacharea tteac on tteac.id=tser.areaId 
+		<where>
+			<if test="areaId!=null">
+				 and tser.areaId =#{areaId} 
+			</if>
+			<if test="staId!=null">
+				 and sche.StationId=#{staId} 
+			</if>
+			<if test="classDate!=null">
+				 and date_format(sche.ClassDate,'%Y-%m-%d')=#{classDate} 
+			</if>
+			and tstu.InsId=#{insId} and sche.Status=3
+		</where>
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	
+	<select id="totalTheoryNum" resultType="Integer">
+		select  count(sche.id)
+		from SchedulingTheory sche left join tstudent tstu 
+		on sche.StudentId=tstu.id left join 
+		tservicestation tser on sche.StationId =tser.id 
+		<where>
+			<if test="areaId!=null">
+				 and tser.areaId =#{areaId} 
+			</if>
+			<if test="staId!=null">
+				 and sche.StationId=#{staId} 
+			</if>
+			<if test="classDate!=null">
+				 and date_format(sche.classDate,'%Y-%m-%d')=#{classDate} 
+			</if>
+			and tstu.InsId=#{insId} and sche.Status=3
+		</where>
+	</select>
+	
+	<!-- 理论课排班学员添加-->
+	<update id="addSchedulingStu" parameterType="com.bjxc.school.SchedulingTheory">
+		update SchedulingTheory
+		<set>
+			ClassDate =#{classDate},
+			<if test="remarks !=null">
+				Remarks=#{remarks},
+			</if>
+			status = 2
+		</set>
+		where id =(#{id})
+	</update>
+</mapper>

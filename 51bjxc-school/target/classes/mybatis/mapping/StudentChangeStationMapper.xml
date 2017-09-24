@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.StudentChangeStationMapper">
+
+	<select id="list" resultType="com.bjxc.school.StudentChangeStation">
+		select scs.*,sd.`Name` as studentName,pf.userName as functionary,ss.`Name` as fromStationName,
+		(SELECT name FROM TServiceStation WHERE ID = scs.ToStation) as toStationName,
+		ct.name as classTypeName
+		from tStudentChangeStation scs 
+		INNER JOIN tstudent sd ON sd.id = scs.StudentID AND sd.status = 2
+		INNER JOIN TServiceStation ss ON sd.StationId = ss.id 
+		INNER JOIN tplatformuser pf ON pf.id = scs.createUserId 
+		INNER JOIN TClassType ct ON ct.id = sd.ClassTypeId
+		<where>
+			sd.insId = #{insId}
+			<if test="startTime != null and endTime != null">
+				and date_format(scs.createtime,'%Y-%m-%d')
+				BETWEEN date_format(#{startTime},'%Y-%m-%d') AND
+				date_format(#{endTime},'%Y-%m-%d')
+			</if>
+			<!-- 全部 -->
+			<if test="status == -1 and stationId != null">
+				and scs.fromStation = #{stationId} 
+				or scs.toStation = #{stationId} 
+			</if>
+			<!-- 待确认 -->
+			<if test="status == 0">
+				and scs.fromStation = #{stationId}
+				and scs.status = 0
+				or scs.toStation = #{stationId} 
+				and scs.status = 0	
+			</if>
+			<!-- 已确认-->
+			<if test="status == 1">
+				and scs.fromStation = #{stationId}
+				and scs.status = 1
+				or scs.status = 2
+				or scs.toStation = #{stationId} 
+				and scs.status = 1
+				or scs.status = 2
+			</if>
+			<!-- 转出 -->
+			<if test="status == 2">
+				and scs.fromStation = #{stationId}
+			</if>
+			<!-- 转入 -->
+			<if test="status == 3">
+				and scs.toStation = #{stationId}
+			</if>
+			ORDER BY createTime DESC
+		</where>
+	</select>
+	
+	<insert id="add" parameterType="com.bjxc.school.StudentChangeStation">
+		insert into tStudentChangeStation(studentId,fromStation,toStation,status,createUserId,createTime)
+		value(#{studentId},#{fromStation},#{toStation},0,#{createUserId},now())
+		<selectKey keyProperty="id" resultType="Integer">
+			select
+			last_insert_id() as id
+		</selectKey>
+	</insert>
+	
+</mapper>

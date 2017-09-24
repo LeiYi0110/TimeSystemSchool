@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<decorators defaultdir="/themes">
+     <decorator name="school" page="school.jsp"/>
+     <decorator name="manager" page="manager.jsp"/>
+     <decorator name="page" page="page.jsp"/>
+     <decorator name="jsp" page="/"/>
+</decorators>
+

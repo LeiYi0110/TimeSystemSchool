@@ -1,0 +1,456 @@
+@CHARSET "UTF-8";
+
+body {
+    background-color: #ffffff;
+}
+
+
+.rk_icon_right {
+    padding-left: 12px;
+}
+
+.rk_icon_left {
+    padding-right: 12px;
+}
+
+.rk_badge {
+    background-color: #134258;
+}
+
+.rk_navbar {
+    background: url(img/head_bg.jpg);
+    font-size: 15px;
+    padding: 10px 0;
+    margin-bottom:0px;
+    border-radius:0px;
+    border:0px solid transparent;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1);
+}
+
+
+
+.rk_navbar_nav > li > a, .rk_navbar_nav > li > a:visited {
+    color: #ffffff !important;
+    text-decoration: none;
+}
+
+.rk_navbar_nav > li > a:hover {
+    color: #dddddd !important;
+    text-decoration: none;
+}
+
+.rk_navbar_nav > li > a:active {
+    color: #ddddddd !important;
+    text-decoration: none;
+}
+
+.rk_navbar_nav {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.rk_navbar_brand {
+    margin-left: 15px;
+}
+
+.rk_navbar_brand_logo {
+    margin-top: 8px;
+    height: 38px;
+    width: 38px;
+}
+
+.rk_navbar_brand_char {
+    margin-top: 6px;
+    margin-left: 8px;
+    height: 26px;
+    width: 55px;
+}
+
+#rk_navbar_collapse {
+    background: url(img/head_bg.jpg);
+}
+
+.rk_content  {
+	max-width: 1440px;
+	min-height:550px;
+	margin: auto;
+	*zoom:1;
+	border: 1px solid #d5d5d5;
+}
+.rk_content:after {
+	content: '.';
+	display: block;
+	clear: both;
+	width: 0;
+	height: 0;
+	visibility: hidden;
+}
+
+.rk_content_sidebar{
+	/**
+	background: #edeef0 url(img/bg_content.png) repeat-y 0 0;
+	**/
+	background: #f7f8f9 url(img/bg_content.png) repeat-y 0 0;
+}
+
+
+.rk_main {
+	min-height: 800px;
+	overflow: hidden;
+	margin-left: 200px;
+	padding-bottom: 20px;
+	position:relative;
+}
+
+
+
+@media screen and (max-width: 1024px) {
+	.rk_main {
+		padding-bottom: 10px;
+	}
+}
+.rk_sidebar {
+	width: 200px;
+	float: left;
+	position: relative;
+	padding-bottom: 60px;
+	font-size: 12px;
+}
+
+.rk_sidebar .banner{
+	height:51px;
+	border-bottom:1px solid #d5d5d5;
+    display: block;
+}
+.rk_sidebar .banner h5{
+	text-shadow:0 1px 0 #999;
+}
+
+
+.rk_sidebar .menu {
+	position: relative;
+	width: 201px;
+	float: left;
+	z-index: 9;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	-khtml-user-select: none;
+	user-select: none;
+}
+
+.rk_sidebar .app_logo {
+	overflow: hidden;
+	position: absolute;
+	left: 24px;
+	top: 12px;
+	height: 20px;
+	line-height: 0;
+	border:1px solid #000;
+	border-radius: 3px;
+	box-shadow: inset 0 0 3px rgba(0, 0, 0, .7);
+}
+.rk_sidebar .app_logo img {
+	width: 20px;
+	height: 20px;
+}
+.rk_sidebar .app_name {
+	position: relative;
+	margin-left: 50px;
+	height: 45px;
+	line-height: 45px;
+	color: #000;
+	font-weight: normal;
+	cursor: pointer;
+}
+.rk_sidebar .app_name .icon,
+.rk_sidebar .app_name [class^="icon_"],
+.rk_sidebar .app_name [class*=" icon_"] {
+	position: relative;
+	bottom: 1px;
+	*bottom: 7px;
+}
+.rk_sidebar .app_name .icon_menu {
+	position: absolute;
+	right: 5px;
+	top: 15px;
+	background-position: -60px 0;
+}
+.rk_sidebar .menu.show .icon_menu {
+	background-position: -60px -20px;
+}
+.rk_sidebar .app_name strong {
+	max-width: 99px;
+	float: left;
+	font-weight: normal;
+	overflow:hidden; 
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+.rk_sidebar .menu.show .app_logo,
+.rk_sidebar .menu.show .app_name {
+	opacity: .7;
+}
+.rk_sidebar .icon,
+.rk_sidebar [class^="icon_"],
+.rk_sidebar [class*=" icon_"] {
+	margin-left: 5px;
+}
+.rk_sidebar .app_name .icon_android {
+	*margin-top: 15px;
+	background-position: -40px -20px;
+}
+.rk_sidebar .app_name .icon_ios {
+	*margin-top: 15px;
+	background-position: -40px 0;
+}
+.rk_sidebar .app_name .icon_windows {
+	*margin-top: 15px;
+	background-position: -40px -40px;
+}
+.rk_sidebar .app_list {
+	display: none;
+	width: 199px;
+	position: absolute;
+	left: 0;
+	top: 45px;
+	background: #FFF;
+	border:1px solid #EFEFEF;
+	box-shadow: 0 3px 8px rgba(0, 0, 0, .3);
+	font-size: 12px;
+}
+.rk_sidebar .menu.show {
+	box-shadow: inset 1px 1px 0px rgba(9, 9, 9, .8);
+}
+.rk_sidebar .menu.show .app_list {
+	display: block;
+}
+.rk_sidebar .header_bar {
+	position: relative;
+}
+.rk_sidebar .header_bar input[type=text] {
+	width: 195px;
+	padding: 6px 2px;
+	border:0 none;
+	border-bottom: 1px solid #CCC;
+	border-radius: 0;
+}
+.rk_sidebar .header_bar button[type="submit"] {
+	position: absolute;
+	right: 5px;
+	top: 5px;
+	width: 20px;
+	height: 22px;
+	text-indent: -999em;
+	overflow: hidden;
+	background: url(img/sprite.png) -19px -197px no-repeat;
+	border: none;
+	cursor: pointer;
+}
+.rk_sidebar .header_inner input[type=text]:focus {
+	box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.5);
+	border-color: #888;
+}
+.rk_sidebar .list {
+}
+.rk_sidebar .list li {
+	position: relative;
+	padding: 0 20px;
+	height: 32px;
+	line-height: 32px;
+	color: #000;
+	overflow:hidden; 
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+.rk_sidebar .list li:hover {
+	text-shadow:0 1px 0 #FFF;
+	color: #CCC;
+}
+.rk_sidebar .list li .sub_menu {
+	visibility: hidden;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	right: 0;
+	top: 0;
+	width:100%;
+	height: 32px;
+	font-size: 0;
+	text-align: center;
+	color: #888;
+	background: rgba(0, 0, 0, .1);
+	box-shadow: inset 0 0 6px rgba(0, 0, 0, .1);
+}
+.rk_sidebar .list li:hover .sub_menu {
+	visibility: visible;
+}
+.rk_sidebar .list .sub_menu a {
+	display: inline-block;
+	*zoom:1;
+	*display: inline;
+	width: 32px;
+	height: 32px;
+	text-align: left;
+	overflow: hidden;
+	font-size: 0;
+	vertical-align: middle;
+	background: url(img/new_sprite.png) no-repeat -100px 0;
+}
+.rk_sidebar .list .sub_menu a.ios {
+	*line-height: 0;
+	background-position: -100px -60px;
+}
+.rk_sidebar .list .sub_menu a.ios:hover {
+	background-position: -100px -100px;
+}
+.rk_sidebar .list .sub_menu a.android {
+	*line-height: 0;
+	background-position: -100px -140px;
+}
+.rk_sidebar .list .sub_menu a.android:hover {
+	background-position: -100px -180px;
+}
+.rk_sidebar .list .sub_menu a.windows {
+	*line-height: 0;
+	background-position: -100px -220px;
+}
+.rk_sidebar .list .sub_menu a.windows:hover {
+	background-position: -100px -260px;
+}
+.rk_sidebar .list .sub_menu a.top {
+	text-indent: 0;
+	font-size: 12px;
+	text-align: center;
+	background: none;
+	text-shadow: 0 0 10px rgba(255, 255, 255, .9);
+}
+.rk_sidebar .list li:hover {
+	
+}
+.rk_sidebar .footer_bar {
+	border-top: 1px solid #d8d8d8;
+}
+.rk_sidebar .footer_bar a {
+	height: 38px;
+	line-height: 38px;
+	width: 99px;
+	float: left;
+	text-align: center;
+	color: #3382c8;
+	background: #f5f5f5;
+}
+.rk_sidebar .footer_bar a.last {
+	width: 98px;
+	border-left: 1px solid #d8d8d8;
+}
+.rk_sidebar .footer_bar a:hover {
+	background: #FFF;
+}
+
+.rk_sidebar .nav {
+	
+}
+.rk_sidebar .icon, .rk_sidebar [class^="icon_"],
+.rk_sidebar [class*=" icon_"] {
+	margin-right: 5px;
+	background: url(img/new_sprite.png) no-repeat;
+}
+
+
+.rk_footer {
+	max-width: 1440px;
+	min-width: 980px;
+	margin: auto;
+	padding: 20px 0;
+	height: 80px;
+	text-align: center;
+	font-size: 12px;
+	color: #999;
+	text-shadow: 0 1px 0 #FFF;
+	border-bottom:1px solid #d5d5d5;
+	border-left:1px solid #d5d5d5;
+	border-right:1px solid #d5d5d5;
+}
+
+.rk_footer p {
+	line-height: 1.6em;
+}
+.rk_footer a {
+	color: #999;
+}
+
+
+
+.rk_main_right .banner{
+	font-weight:bold;
+	position:relative;
+	float:left;
+	font-size:14px;
+	margin-right:20px;
+	width:180px;
+	padding:10px 20px 10px 0px;
+	line-height:30px;
+	color:#555555;
+	border-bottom:1px solid #DDD;
+}
+.rk_irb_body{
+	padding-top:15px;
+	margin-bottom:2px;
+	clear:both;
+}
+.rk_irb_body:before,.rk_irb_body:after{
+	display:table;
+	content:"";
+}
+/*
+*	重写bootstrap 样式 start
+*/
+.nav-pills > li > a{
+	border-radius: 0px;
+}
+
+.nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus{
+	color:#000;
+	background-color:#edeef0;
+	border-bottom:3px solid #428bca;
+	
+}
+/*
+*	弹出框的边框改为直角
+*/
+.modal-content{
+	border-radius: 0px;
+}
+/**
+.modal-footer{
+	padding:3px 2px;
+	background:none repeat scroll 0% 0% #FAFAFA;
+}
+**/
+.form-control{
+	border-radius:2px;
+}
+.input-group-addon{
+	padding:1px 5px;
+	border-radius:2px;
+}
+.form_datetime {
+	margin-top:5xp;
+	padding:4px 0px;
+}
+
+.form-horizontal .control-label{
+	text-align:left;
+}
+.form-group{
+	margin-bottom:5px;
+}
+.form-control select{
+	-webkit-border-radius:2px;
+	-moz-border-radius:2px;
+	border-radius:2px;
+}
+/*
+*	重写bootstrap 样式 end
+*/

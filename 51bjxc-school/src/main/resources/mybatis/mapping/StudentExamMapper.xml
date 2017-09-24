@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.StudentExamMapper">
+	<select id="list" resultType="com.bjxc.school.StudentExam">
+		select s.id,s.StudentID,s.InsId,s.CoachId,s.SubjectId,s.ExamField,s.pass,s.ExamTime,s.CreateTime, t.name as stationName,
+		t.area,stu.name as stuName,coach.Name as coachName,stu.StationId as stationId 
+		from tstudentexam s,TServiceStation t,TStudent stu,tcoach coach 
+		where s.pass is not null and s.checkStatus=0 and t.ID=stu.StationId and s.studentid=stu.id and s.InsId=#{insId} and s.CoachId=coach.ID 
+			<if test="searchText != null">
+				AND stu.name like CONCAT(CONCAT('%',#{searchText}), '%')
+			</if>
+			 order by s.ExamTime
+	</select>
+	
+	<update id="updateExam" parameterType="com.bjxc.school.StudentExam">
+		update tstudentexam set pass=#{pass},checkStatus=1,score=#{score} where id=#{id}
+	</update>
+	
+</mapper>

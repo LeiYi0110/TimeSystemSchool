@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.PlatformUserAuthMapper">
+
+	<insert id="add" parameterType="com.bjxc.school.PlatformUserAuth">
+		insert into tplatformuserauth
+		(platformUserId,operationItemId)
+		values
+		<foreach collection="list" item="item" separator=",">
+			(#{item.platformUserId},#{item.operationItemId})
+		</foreach>
+		
+	</insert>
+	
+	<delete id="delete" parameterType="int">
+		delete from tplatformuserauth
+		where platformUserId=#{platformUserId}
+	</delete>
+	
+	<select id="getByPlatformUserId" resultType="com.bjxc.school.PlatformUserAuth">
+		select * from tplatformuserauth
+		where platformUserId = #{platformUserId}
+	</select>
+
+</mapper>

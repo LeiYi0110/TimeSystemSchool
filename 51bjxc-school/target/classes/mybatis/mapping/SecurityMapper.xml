@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.SecurityMapper">
+	
+	<select id="pageList" resultType="com.bjxc.school.Security">
+		select * 
+		from tsecurity
+			<where>
+			<if test="insId != null">
+				and insId=#{insId} 
+			</if>
+			<if test="searchText != null">
+				and (name  like CONCAT(CONCAT('%',#{searchText}), '%')
+				or Mobile like CONCAT(CONCAT('%',#{searchText}), '%')
+				or idcard like CONCAT(CONCAT('%',#{searchText}), '%')
+				)
+			</if>
+		</where>
+		order by id desc limit ${start},${size}
+	</select>
+	<select id="total" resultType="Integer">
+		select count(*) from tsecurity
+		<where>
+			<if test="insId != null">
+				and insId=#{insId} 
+			</if>
+			<if test="searchText != null">
+				and (name  like CONCAT(CONCAT('%',#{searchText}), '%')
+				or Mobile like CONCAT(CONCAT('%',#{searchText}), '%')
+				or idcard like CONCAT(CONCAT('%',#{searchText}), '%')
+				)
+			</if>
+		</where>
+	</select>
+	
+	<!-- 添加数据 -->
+	<insert id="add" parameterType="com.bjxc.school.Security">
+		insert into
+		tsecurity(
+		insId,name,sex,idcard,mobile,address,photo, 
+		fingerprint,drilicence,fstdrilicdate,dripermitted,teachpermitted,employstatus,hiredate,leavedate,secunum,photoUrl,isCountry,isProvince
+		)
+		value(#{insId},#{name},#{sex},#{idcard},#{mobile},#{address},#{photo}
+		,#{fingerprint},#{drilicence},#{fstdrilicdate},#{dripermitted},#{teachpermitted},#{employstatus},#{hiredate}
+		,#{leavedate},#{secunum},#{photoUrl},#{isCountry},#{isProvince})
+	</insert>
+	<!-- 修改安全员信息 -->
+	<update id="update" parameterType="com.bjxc.school.Student">
+		update tsecurity
+		<set>
+			<if test="insId != null">
+                insId = #{insId},
+			</if>
+			<if test="name != null">
+                name = #{name},
+			</if>
+			<if test="sex != null">
+                sex = #{sex},
+			</if>
+			<if test="idcard != null">
+                idcard = #{idcard},
+			</if>
+			<if test="mobile != null">
+                mobile = #{mobile},
+			</if>
+			<if test="address != null">
+                address = #{address},
+			</if>
+			<if test="photo != null">
+                photo = #{photo},
+			</if>
+			<if test="fingerprint != null">
+                fingerprint = #{fingerprint},
+			</if>
+			<if test="drilicence != null">
+                drilicence = #{drilicence},
+			</if>
+			<if test="fstdrilicdate != null">
+                fstdrilicdate = #{fstdrilicdate},
+			</if>
+			<if test="dripermitted != null">
+                dripermitted = #{dripermitted},
+			</if>
+			
+			<if test="teachpermitted != null">
+                teachpermitted = #{teachpermitted},
+			</if>
+			<if test="employstatus != null">
+                employstatus = #{employstatus},
+			</if>
+			<if test="hiredate != null">
+                hiredate = #{hiredate},
+			</if>
+			<if test="leavedate != null">
+                leavedate = #{leavedate},
+			</if>
+			<if test="photoUrl!=null">
+				photoUrl=#{photoUrl},
+			</if>
+			<if test="isProvince!=null">
+				isProvince=#{isProvince}
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	<!-- 查询所有 安全员信息-->
+	<select id="securityList" resultType="com.bjxc.school.Security">
+		select id,insId,name,sex,idcard,mobile,address,photo,fingerprint,drilicence,fstdrilicdate,dripermitted,teachpermitted,employstatus,hiredate,leavedate,secunum,photoUrl 
+		from tsecurity where insId=#{insId}
+	</select>
+	
+	<update id="updatestatus"  parameterType="com.bjxc.school.Security">
+	     <!-- update tsecurity set employstatus=1,isProvince=0  where id=#{id} -->
+	     delete from tsecurity where id=#{id}
+	</update>
+</mapper>

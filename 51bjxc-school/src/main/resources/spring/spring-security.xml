@@ -1,0 +1,67 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+			 http://www.springframework.org/schema/beans 
+			 http://www.springframework.org/schema/beans/spring-beans.xsd
+             http://www.springframework.org/schema/context  
+             http://www.springframework.org/schema/context/spring-context-3.1.xsd  
+			 http://www.springframework.org/schema/security
+			 http://www.springframework.org/schema/security/spring-security.xsd
+			">
+		
+   	 	<!--  Spring-Security 的配置 --> 
+		<security:http auto-config="true" use-expressions="true" >
+		    <security:csrf disabled="true"/>
+			<security:intercept-url pattern="/login" access="permitAll"/>
+	        <!-- <security:intercept-url pattern="/mypermission" access="hasRole('ROLE_USER')"/>  -->
+	        <security:intercept-url pattern="/view/**" access="hasAnyRole('ROLE_SCHOOL_MANAGER','ROLE_SCHOOL_SERVICE')"/>
+	        <security:intercept-url pattern="/page/**" access="hasRole('ROLE_USER')"/>
+	         
+	        <security:access-denied-handler error-page="/denied"/>
+	        
+	        <security:form-login  
+	                login-page="/login"   
+	                authentication-failure-url="/login?error=true"
+	                login-processing-url="/security_check"	
+	                default-target-url="/view/school"/>  
+	              
+	        <security:logout   
+	                invalidate-session="true"   
+	                logout-success-url="/login"   
+	                logout-url="/logout"/>  
+		</security:http>
+		
+    
+	 <!-- 指定一个自定义的authentication-manager :customUserDetailsService -->  
+    <security:authentication-manager>  
+            <security:authentication-provider user-service-ref="schoolUserDetailsService">  
+                    <security:password-encoder ref="passwordEncoder"/>  
+            </security:authentication-provider>  
+    </security:authentication-manager> 
+    
+     <!-- 对密码进行MD5编码 -->  
+    <bean class="org.springframework.security.authentication.encoding.Md5PasswordEncoder" id="passwordEncoder"/>  
+  
+    <!--   
+        通过 SchoolUserDetailsService,Spring会自动的用户的访问级别.  
+        也可以理解成:以后我们和数据库操作就是通过customUserDetailsService来进行关联.  
+     -->  
+    <bean id="schoolUserDetailsService" class="com.bjxc.school.security.SchoolUserDetailsService"/>
+
+	<bean id="schoolUserMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.bjxc.school.security.SchoolUserMapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	
+	<bean id="roleAuthMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.bjxc.school.security.RoleAuthMapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	
+	<bean id="userAuthMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.bjxc.school.security.UserAuthMapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+</beans>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.SystemConfigMapper">
+	<select id="getSystemConfigList" resultType="com.bjxc.school.SystemConfig">
+		select * from jSystemConfig
+	</select>
+	
+	<select id="getSystemConfigListByInscode" resultType="com.bjxc.school.SystemConfig">
+		select * from jSystemConfig where Inscode=#{Inscode} 
+	</select>
+	
+	<select id="getSystemConfigById" resultType="com.bjxc.school.SystemConfig">
+		select * from jSystemConfig where id=#{id} 
+	</select>
+	<insert id="add" parameterType="com.bjxc.school.SystemConfig"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into jSystemConfig(Inscode,flag_name,flag_value)value(#{Inscode},#{flag_name},#{flag_value})
+	</insert>
+
+	<update id="update" parameterType="com.bjxc.school.SystemConfig">
+		update jSystemConfig
+		<set>
+			<if test="flagValue != null">
+				flagValue=#{flagValue}
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+
+</mapper>

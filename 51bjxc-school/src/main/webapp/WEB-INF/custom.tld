@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taglib version="2.0" xmlns="http://java.sun.com/xml/ns/j2ee"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+ xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee web-jsptaglibrary_2_0.xsd">
+ <tlib-version>1.0</tlib-version>
+ <short-name>custom</short-name>
+ <tag>
+    <name>properties</name>
+    <tag-class>com.bjxc.school.utils.CustomTag</tag-class>
+    <body-content>scriptless</body-content> <!-- 表示标签体可以包含EL表达式和JSP动作元素，但不能包含JSP的脚本元素  -->
+    <attribute>
+       <name>name</name>
+    </attribute>
+  </tag>
+</taglib>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.StudentInstitutionMapper">
+	<!-- 转出记录 -->
+	<select id="fromList" resultType="com.bjxc.school.StudentChangeInstitution">
+		select sci.*,stu.name as studentName,stu.sex,ins.name as insName,stu.Idcard as idcard,stu.stunum as stunum from TStudentChangeInstitution sci 
+			left join TStudent stu on stu.id=sci.StudentID
+			left join TInstitution ins on ins.ID=sci.ToInsId
+			<where>
+				fromInsId=#{fromInsId}
+			</where>
+				<if test="searchText != null">
+				 and (stu.name like CONCAT(CONCAT('%',#{searchText}), '%')
+				 or stu.Idcard  like CONCAT(CONCAT('%',#{searchText}), '%'))
+			</if>
+		limit ${start},${size}
+	</select>
+	
+	<select id="total" resultType="Integer">
+		select count(*) from TStudentChangeInstitution sci 
+			left join TStudent stu on stu.id=sci.StudentID
+			left join TInstitution ins on ins.ID=sci.FromInsId
+			<where>
+				fromInsId=#{fromInsId}
+			</where>
+			<if test="searchText != null">
+				 and (stu.name like CONCAT(CONCAT('%',#{searchText}), '%')
+				 or stu.Idcard  like CONCAT(CONCAT('%',#{searchText}), '%'))
+			</if>
+	</select>
+	
+	
+	<!-- 转入记录 -->
+	<select id="toList" resultType="com.bjxc.school.StudentChangeInstitution">
+				select sci.*,stu.name as studentName,stu.sex,ins.name as insName,stu.Idcard as idcard,stu.stunum as stunum from TStudentChangeInstitution sci 
+			left join TStudent stu on stu.id=sci.StudentID
+			left join TInstitution ins on ins.ID=sci.FromInsId
+			<where>
+				toInsId=#{toInsId}
+			</where>
+				<if test="searchText != null">
+				 and (stu.name like CONCAT(CONCAT('%',#{searchText}), '%')
+				 or stu.Idcard  like CONCAT(CONCAT('%',#{searchText}), '%'))
+			</if>
+		limit ${start},${size}
+	</select>
+	<select id="toTotal" resultType="Integer">
+		select count(*) from TStudentChangeInstitution sci 
+			left join TStudent stu on stu.id=sci.StudentID
+			left join TInstitution ins on ins.ID=sci.toInsId
+			<where>
+				toInsId=#{toInsId}
+			</where>
+			<if test="searchText != null">
+				 and (stu.name like CONCAT(CONCAT('%',#{searchText}), '%')
+				 or stu.Idcard  like CONCAT(CONCAT('%',#{searchText}), '%'))
+			</if>
+	</select>
+	
+<!-- 	<update id="updatestu" resultType="com.bjxc.school.StudentChangeInstitution"> 
+	   update TStudentChangeInstitution set isProvince=#{isProvince} where id=#{id}
+	</update> -->
+	
+</mapper>

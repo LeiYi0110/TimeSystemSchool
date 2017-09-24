@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.StudentInsLogMapper">
+	
+
+	<insert id="addHasTime"  parameterType="com.bjxc.school.StudentInsLog" useGeneratedKeys="true" keyProperty="id">
+		insert into TStudentInsLog
+			(StudentID,InsId,Content,Category,CreateTime)
+		value
+			(#{studentID},#{insId},#{content},#{category},#{createTime})
+	</insert>
+	
+	
+	<select id="getList" resultType="com.bjxc.school.StudentInsLog">
+		select l.*,s.name as studentName,s.stunum ,s.Idcard,s.Mobile 
+		from TStudentInsLog l left join tstudent s on l.studentId = s.id 
+		where 
+		s.name like CONCAT(CONCAT('%',#{search}), '%') or
+		s.stunum = #{search} or
+		s.Idcard =#{search}
+	</select>
+</mapper>

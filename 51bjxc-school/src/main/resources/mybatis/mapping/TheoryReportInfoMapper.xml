@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.TheoryReportInfoMapper">
+	
+	<select id="getCourseList" resultType="com.bjxc.school.TheoryReportInfo">
+		select tser.`Name` stationName,theo.repNumber,theo.Createtime
+		from theoryreportinfo theo left join tservicestation tser on theo.StationId=tser.id
+		<where>
+			<if test="areaId!=null">
+				 and tser.areaId =#{areaId} 
+			</if>
+			<if test="beginCreateTiStr!=null">
+				<if test="endCreateTiStr!=null">
+				 	and DATE_FORMAT(theo.createTime,'%Y-%m-%d') between date(#{beginCreateTiStr}) and date(#{endCreateTiStr})
+				</if> 
+			</if>
+			and theo.InsId=#{insId}
+		</where>
+		<if test="start!=null and size!=null">
+			 limit #{start},#{size};
+		</if>
+	</select>
+	
+	<select id="getSumNum" resultType="Integer">
+		select sum(theo.repNumber)
+		from theoryreportinfo theo left join tservicestation tser on theo.StationId=
+		tser.id
+		<where>
+			<if test="areaId!=null">
+				 and tser.areaId =#{areaId} 
+			</if>
+			<if test="beginCreateTiStr!=null">
+				<if test="endCreateTiStr!=null">
+				 	and DATE_FORMAT(theo.createTime,'%Y-%m-%d') between date(#{beginCreateTiStr}) and date(#{endCreateTiStr})
+				</if> 
+			</if>
+			and theo.InsId=#{insId}
+		</where>
+	</select>
+	
+	<select id="totalCourseNum" resultType="Integer">
+		select count(theo.id) 
+		from theoryreportinfo theo left join tservicestation tser on theo.StationId=
+		tser.id
+		<where>
+			<if test="areaId!=null">
+				 and tser.areaId =#{areaId} 
+			</if>
+			<if test="beginCreateTiStr!=null">
+				<if test="endCreateTiStr!=null">
+				 	and DATE_FORMAT(theo.createTime,'%Y-%m-%d') between date(#{beginCreateTiStr}) and date(#{endCreateTiStr})
+				</if> 
+			</if>
+			and theo.InsId=#{insId}
+		</where>
+	</select>
+	
+	<select id="getStationByAreaId" resultType="com.bjxc.school.ServiceStation">
+		select id,`name` from tservicestation 
+		<where>
+			insId=#{insId} 
+			<if test="areaId!=null">
+				 and areaId=#{areaId};
+			</if>
+		</where>
+	</select>
+</mapper>

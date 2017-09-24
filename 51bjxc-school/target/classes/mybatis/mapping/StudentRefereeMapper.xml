@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.StudentRefereeMapper">
+	<select id="list" resultType="com.bjxc.school.StudentReferee">
+		select r.*,c.name as typeName,c.price,p.TotalFee as money,p.Payment,p.status as statuss,s.id as stuId    
+			from TStudentReferee r 
+			LEFT JOIN tuser u on r.UserID=u.id
+			LEFT JOIN tclasstype c on c.id=r.classType     
+			LEFT JOIN tpayorder p on r.id=p.BId    
+			LEFT JOIN tstudent s on u.id=s.UserID
+			where r.insId=#{insId}
+			<if test="status!=null">
+				and r.status=#{status}
+			</if>
+			order by r.CreateTime LIMIT #{start},#{size}
+	</select>
+	
+	<select id="total" resultType="Integer">
+		select count(1)  
+			from TStudentReferee r 
+			LEFT JOIN tuser u on r.UserID=u.id
+			LEFT JOIN tclasstype c on c.id=r.classType     
+			LEFT JOIN tpayorder p on r.id=p.BId    
+			LEFT JOIN tstudent s on u.id=s.UserID
+			where r.insId=#{insId}
+			<if test="status!=null">
+				and r.status=#{status}
+			</if>
+	</select>
+	
+	<insert id="insert" parameterType="com.bjxc.school.StudentReferee" useGeneratedKeys="true" keyProperty="id">
+		insert into tstudentreferee
+		(UserID,InsId,ClassType,Name,Mobile,Idcard,Sex,Address,refereeMobile,Status,CreateTime,refereeName)
+		values (#{userID},#{insId},#{classType},#{name},#{mobile},#{idcard},#{sex},#{address},#{refereeMobile},#{status},#{createTime},#{refereeName});
+	</insert>
+	
+	<select id="StudentRefereeList" resultType="com.bjxc.school.StudentRefereeInfo">
+		select * 
+			, d.classcurr as className
+			, c.id as stuId
+		from tstudentreferee a
+			left join tuser b on a.userid = b.id
+			left join tstudent c on c.userid = b.id and b.urole = 1
+			left join tclasstype d on d.id = c.classtypeid
+		<where>
+			<if test="insId != null and insId != 0">
+				and a.insId = #{insId}
+			</if>
+			<if test="stationId != null and stationId != 0">
+				and c.stationId = #{stationId}
+			</if>
+			<if test="startTime != null">
+				and a.createTime &gt; #{startTime}
+			</if>
+			<if test="endTime != null">
+				and a.createTime &lt; #{startTime}
+			</if>
+			<if test="searchText != null and !searchText.equals(&quot;&quot;)">
+				and (
+				a.name like CONCAT(CONCAT('%',#{searchText}), '%')
+					or c.trainType like CONCAT(CONCAT('%',#{searchText}), '%')
+				)
+			</if>
+		</where>
+		limit #{startIndex},#{pageSize}
+	</select>
+	
+	<select id="StudentRefereeTotal" resultType="int">
+		select count(1)
+		from tstudentreferee a
+			left join tuser b on a.userid = b.id
+			left join tstudent c on c.userid = b.id and b.urole = 1
+			left join tclasstype d on d.id = c.classtypeid
+		<where>
+			<if test="insId != null and insId != 0">
+				and a.insId = #{insId}
+			</if>
+			<if test="stationId != null and stationId != 0">
+				and c.stationId = #{stationId}
+			</if>
+			<if test="startTime != null">
+				and a.createTime &gt; #{startTime}
+			</if>
+			<if test="endTime != null">
+				and a.createTime &lt; #{startTime}
+			</if>
+			<if test="searchText != null and !searchText.equals(&quot;&quot;)">
+				and (
+				a.name like CONCAT(CONCAT('%',#{searchText}), '%')
+					or c.trainType like CONCAT(CONCAT('%',#{searchText}), '%')
+				)
+			</if>
+		</where>
+	</select>
+	
+	<select id="getByUserId" resultType="com.bjxc.school.StudentReferee">
+		select * 
+		from tstudentreferee
+		where userid = #{userId}
+		limit 1;
+	</select>
+</mapper>

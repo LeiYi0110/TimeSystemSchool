@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.InstitutionInfoMapper">
+	
+	<select id="get" resultType="com.bjxc.school.InstitutionInfo" parameterType="Integer">
+		select *
+		from `TInstitution`
+		where id=#{id};
+	</select>
+	<!-- 驾校概况 -->
+	<parameterMap type="map" id="NumberMap">
+		<parameter property="insId" jdbcType="INTEGER" mode="IN" />
+		<parameter property="staId" jdbcType="INTEGER" mode="IN" />
+		<parameter property="stuCount" jdbcType="INTEGER" mode="OUT" />
+		<parameter property="todayStuCount" jdbcType="INTEGER" mode="OUT" />
+		<parameter property="yesterdayStuCount" jdbcType="INTEGER" mode="OUT" />
+		<parameter property="monthStuCount" jdbcType="INTEGER" mode="OUT" />
+		<parameter property="notAcceptedOneStuCount" jdbcType="INTEGER" mode="OUT" />
+		<parameter property="notSubjectOneStuCount" jdbcType="INTEGER" mode="OUT" />
+		<parameter property="subjectOneStuCount" jdbcType="INTEGER" mode="OUT" />
+		<parameter property="subjectTwoStuCount" jdbcType="INTEGER" mode="OUT" />
+		<parameter property="subjectThreeStuCount" jdbcType="INTEGER" mode="OUT" />
+		<parameter property="subjectFourStuCount" jdbcType="INTEGER" mode="OUT" />
+		<parameter property="allStuCount" jdbcType="INTEGER" mode="OUT" />
+	</parameterMap>  
+	<select id="getGeneralSituation" parameterMap="NumberMap" statementType="CALLABLE">
+      {call 51bjxc.driving_situation(
+      ?,?,?,?,?,?,?,?,?,?,?,?,?
+      )}
+    </select>
+	
+	<insert id="add" parameterType="com.bjxc.school.InstitutionInfo"
+	useGeneratedKeys="true" keyProperty="id">
+		insert into tinstitution(
+			Name,district,ShortName,Licnum,Licetime,Business,Creditcode,
+			postcode,Province,City,Area,Address,Legal,Busistatus,Contact,
+			Phone,Inscode,level,coachnumber,grasupvnum,safmngnum,
+			tracarnum,classroom,thclassroom,praticefield,introduction,CreateTime,
+			busiscope,isProvince,isCountry
+			)
+		 values(#{name},#{district},#{shortName},#{licnum},#{licetime},#{business},#{creditcode},
+			#{postcode},#{province},#{city},#{area},#{address},#{legal},#{busistatus},#{contact},
+			#{phone},#{inscode},#{level},#{coachnumber},#{grasupvnum},#{safmngnum},
+			#{tracarnum},#{classroom},#{thclassroom},#{praticefield},#{introduction},#{createTime},#{busiscope},#{isProvince},1)
+	</insert>
+	
+	
+	<insert id="addByExcel" parameterType="com.bjxc.school.InstitutionInfo"
+	useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO `tinstitution` 
+		(`Name`, `district`, `ShortName`, `Licnum`, `Licetime`, `Business`, `Creditcode`, 
+		`Address`, `Legal`, `Busistatus`, `Contact`, `Phone`, `Inscode`, `level`, `coachnumber`, 
+		`grasupvnum`, `safmngnum`, `tracarnum`, `classroom`, `thclassroom`, `praticefield`,`CreateTime`, `busiscope`, `postcode`) 
+		VALUES (
+		#{name},#{district},#{shortName},#{licnum},#{licetime},#{business},#{creditcode},
+		#{address},#{legal},#{busistatus},#{contact},#{phone},#{inscode},#{level},#{coachnumber},
+		#{grasupvnum},#{safmngnum},#{tracarnum},#{classroom},#{thclassroom},#{praticefield},now(),#{busiscope},#{postcode}
+		);
+	</insert>
+	
+	<!-- 修改培训机构信息 -->
+	<update id="update" parameterType="com.bjxc.school.InstitutionInfo">
+		update TInstitution
+		<set>
+			<if test="name != null">
+				Name = #{name},
+			</if>
+			<if test="district != null">
+				district = #{district},
+			</if>
+			<if test="shortName != null">
+				ShortName = #{shortName},
+			</if>
+			<if test="licnum != null">
+				Licnum = #{licnum},
+			</if>
+			<if test="licetime != null">
+				Licetime = #{licetime},
+			</if>
+			<if test="business != null">
+				Business = #{business},
+			</if>
+			<if test="creditcode != null">
+				Creditcode = #{creditcode},
+			</if>
+			<if test="postcode != null">
+				postcode = #{postcode},
+			</if>
+			<if test="province != null">
+				Province = #{province},
+			</if>
+			<if test="city != null">
+				City = #{city},
+			</if>
+			<if test="area != null">
+				Area = #{area},
+			</if>
+			<if test="address != null">
+				Address = #{address},
+			</if>
+			<if test="legal != null">
+				Legal = #{legal},
+			</if>
+			<if test="busistatus != null">
+				Busistatus = #{busistatus},
+			</if>
+			<if test="contact != null">
+				Contact = #{contact},
+			</if>
+			<if test="phone != null">
+				Phone = #{phone},
+			</if>
+			<if test="inscode != null">
+				Inscode = #{inscode},
+			</if>
+			<if test="level != null">
+				level = #{level},
+			</if>
+			<if test="coachnumber != null">
+				coachnumber = #{coachnumber},
+			</if>
+			<if test="grasupvnum != null">
+				grasupvnum = #{grasupvnum},
+			</if>
+			<if test="safmngnum != null">
+				safmngnum = #{safmngnum},
+			</if>
+			<if test="tracarnum != null">
+				tracarnum = #{tracarnum},
+			</if>
+			<if test="classroom != null">
+				classroom = #{classroom},
+			</if>
+			<if test="thclassroom != null">
+				thclassroom = #{thclassroom},
+			</if>
+			<if test="praticefield != null">
+				praticefield = #{praticefield},
+			</if>
+			<if test="introduction != null">
+				introduction = #{introduction},
+			</if>
+			<if test="createTime != null">
+				CreateTime = #{createTime},
+			</if>
+			<if test="busiscope!= null and busiscope!=''">
+				busiscope = #{busiscope},
+			</if>
+			<if test="isProvince!=null">
+				isProvince=#{isProvince},
+			</if>
+			<if test="remark!=null">
+				 remark=#{remark} 
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	<select id="pageList" resultType="com.bjxc.school.InstitutionInfo">
+		select * from TInstitution
+			<where>
+			<if test="searchText != null">
+				and (Name  like CONCAT(CONCAT('%',#{searchText}), '%')
+				or Licnum like CONCAT(CONCAT('%',#{searchText}), '%')
+				or Address like CONCAT(CONCAT('%',#{searchText}), '%')
+				)
+			</if>
+		</where>
+		limit ${start},${size}
+	</select>
+	<select id="total" resultType="Integer">
+		select count(*) from TInstitution
+		<where>
+			<if test="searchText != null">
+				and (Name  like CONCAT(CONCAT('%',#{searchText}), '%')
+				or Licnum like CONCAT(CONCAT('%',#{searchText}), '%')
+				or Address like CONCAT(CONCAT('%',#{searchText}), '%')
+				)
+			</if>
+		</where>
+		
+	</select>
+</mapper>

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.TeachLogMapper">
+
+	<select id="getList" resultType="com.bjxc.school.TeachLog">
+		select tr.*,ts.name as stuname,ts.stunum,ti.inscode
+			,tc.name as coachname
+			,(
+				select ( case when ta.aok >= ta.logratio * ta.acount then ta.acount
+							else round(ta.aok * (4/3)) end 
+					) as approvalDuration <!-- 认可学时计算逻辑 -->
+				from (
+					select a.*,(
+						select count(1) from traininglog atl where atl.trainingrecordid = a.id
+						) as acount <!-- 计算出共有学时 -->
+						,(
+						select count(1) from traininglog atlb where atlb.trainingrecordid = a.id and atlb.inspass > 0
+						) as aok 
+					from trainingrecord a
+				) ta where ta.id = tr.id
+			) as approvalDuration <!-- 认可学时 -->
+			,(
+				select sum(tb.approvalDuration) as subjectApprovalDuration 
+				from (
+					select ta.* 
+						,( case 
+								when ta.aok >= ta.logratio * ta.acount then ta.acount
+								else round(ta.aok * (4/3)) 
+							end 
+						) as approvalDuration <!-- 认可学时计算逻辑 -->
+					from (
+						
+						select a.*
+							,(
+								select count(1) from traininglog atl where atl.trainingrecordid = a.id
+							) as acount <!-- 计算出共有学时 -->
+							,(
+								select count(1) from traininglog atlb where atlb.trainingrecordid = a.id and atlb.inspass > 0
+							) as aok <!-- 计算出合格学时 -->
+						from trainingrecord a
+					) ta
+				) tb	
+				where tb.studentid = tr.studentid and tb.subjectid = tr.subjectid
+			) as subjectApprovalDuration <!-- 本部分认可学时 -->
+			,(
+				select sum(mileage) from trainingrecord str
+				where str.subjectid = tr.subjectid and tr.studentid = str.studentid
+			) as subjectMileage <!-- 本部分累计里程 -->
+			,(
+				select count(1) from traininglog atlc 
+				where atlc.trainingrecordid = tr.id and atlc.inspass > 0
+			) as approvalDurationCount <!-- 认可学时数量 -->
+		from trainingrecord tr 
+			INNER JOIN tstudent ts on ts.id=tr.studentid
+			INNER JOIN TInstitution ti on ti.id=ts.insid
+			left join tcoach tc on tc.id = tr.coachid
+		<where>
+			<if test="searchText!=null and searchText!=''">
+				and ts.name like CONCAT(CONCAT('%',#{searchText}), '%')
+			</if>
+			<if test="subjectId!=null and subjectId!=''">
+				and tr.subjectId = #{subjectId}
+			</if>
+			<if test="day!=null and day!=''">
+				and date_format(tr.startTime,'%Y%m%d')=date_format(#{day},'%Y%m%d')
+			</if>
+			and tr.endTime is not null 
+		</where>
+		order by tr.id desc limit 100
+	</select>
+	
+	<select id="getOne" resultType="com.bjxc.school.TeachLog">
+		<!-- select tr.*,ts.name as stuname,ts.stunum,ti.inscode,rl.sum_distance as mileage,rl.carSpeed as avevelocity,
+		tc.coachnum,td.devnum,car.carnum
+		from trainingrecord tr 
+		INNER JOIN tstudent ts on ts.id=tr.studentid 
+		INNER JOIN TInstitution ti on ti.id=ts.insid 
+		LEFT JOIN tcoach tc on tc.id=tr.coachid 
+		LEFT JOIN tdevice td on td.id=tr.deviceid 
+		LEFT JOIN rlocationinfo rl on rl.id=tr.locationinfoid 
+		LEFT JOIN trainingcar car on car.id=tr.trainingcarId
+		where tr.id=#{id} -->
+		select tr.*,ts.name as stuname,ts.stunum,ti.inscode,tc.coachnum,td.devnum,car.carnum,part1,part2,part3,part4,total
+		from trainingrecord tr 
+		INNER JOIN tstudent ts on ts.id=tr.studentid 
+		INNER JOIN TInstitution ti on ti.id=ts.insid 
+
+		INNER JOIN (select studentId,SUM(IF(subjectId=1,amt,0)) AS part1, SUM(IF(subjectId=2,amt,0)) AS part2, SUM(IF(subjectId=3,amt,0)) AS part3, SUM(IF(subjectId=4,amt,0)) AS part4, sum(amt) as total 
+		from (select subjectId,studentId, sum(TIMESTAMPDIFF(MINUTE,startTime,endTime)) as amt from trainingrecord 
+		 group by subjectId,studentId ) as a  group by studentId) as b on tr.studentid=b.studentid 
+
+		LEFT JOIN tcoach tc on tc.id=tr.coachid 
+		LEFT JOIN tdevice td on td.id=tr.deviceid 
+		LEFT JOIN trainingcar car on car.id=tr.trainingcarId
+		where tr.id=#{id}
+	</select>
+	
+	<select id="getTimeRecord" resultType="java.util.HashMap">
+SELECT
+	studentId,
+	t.name,
+	t.stunum,
+	t.photo,
+	t.sex,
+	t.Cradtype,
+	t.idcard,
+	t.address,
+	t.mobile,
+	t.Traintype,
+	t.CreateTime,
+	SUM(IF(subjectId = 1, amt, 0)) AS part1,
+	SUM(IF(subjectId = 2, amt, 0)) AS part2,
+	SUM(IF(subjectId = 3, amt, 0)) AS part3,
+	SUM(IF(subjectId = 4, amt, 0)) AS part4,
+	sum(amt) AS total,
+	SUM(IF(subjectId = 1, mileage, 0)) AS mpart1,
+	SUM(IF(subjectId = 2, mileage, 0)) AS mpart2,
+	SUM(IF(subjectId = 3, mileage, 0)) AS mpart3,
+	SUM(IF(subjectId = 4, mileage, 0)) AS mpart4,
+	sum(mileage) AS mtotal
+FROM
+	(
+	SELECT
+			subjectId,
+			studentId,
+			sum(
+				TIMESTAMPDIFF(MINUTE, startTime, endTime)
+			) AS amt,
+			sum(tr.mileage) AS mileage
+		FROM
+			trainingrecord tr
+		WHERE
+			isProvince = 1
+		GROUP BY
+			subjectId,
+			studentId
+
+	) AS a
+LEFT JOIN tstudent t ON t.id = a.studentId
+WHERE
+	studentid = #{id}
+GROUP BY
+	studentId
+
+	</select>
+	
+	<select id="getRecordMap" resultType="java.util.HashMap">
+		<!-- select studentId,t.name,t.stunum,SUM(IF(subjectId=1,amt,0)) AS part1, SUM(IF(subjectId=2,amt,0)) AS part2, SUM(IF(subjectId=3,amt,0)) AS part3, SUM(IF(subjectId=4,amt,0)) AS part4, sum(amt) as total 
+			from (select subjectId,studentId, sum(endTime - startTime) as amt from trainingrecord group by subjectId,studentId ) 
+			as a 
+			left join tstudent t on t.id=a.studentId
+			group by studentId -->
+		select studentId,t.name,t.stunum from trainingrecord inner join tstudent t on t.id=studentId group by studentId
+	</select> 
+	
+	<update id="updateImagePass">
+		update tdeviceimage
+		set inpass=#{pass} , reason = #{reason}
+		where id=#{imageId}
+	</update>
+	
+	<update id="batchTeachLog">
+		update TrainingRecord
+		set inpass= #{pass} , reason = #{reason}
+		where id in (
+		<foreach collection="list" separator="," item="item">
+			#{item}
+		</foreach>
+		)
+	</update>
+</mapper>

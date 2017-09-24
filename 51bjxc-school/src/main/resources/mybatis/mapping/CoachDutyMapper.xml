@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.CoachDutyMapper">
+
+	<!-- 获取某个教练的排班列表 -->
+	<select id="list" resultType="com.bjxc.school.CoachDuty">
+		select tcd.* 
+		from tcd.tcoachduty tcd
+		where tcd.coachdid= #{coachId}
+			and tcd.day >= #{now}
+			and tcd.day &lt;= #{enDate}
+		;
+	</select>
+	
+	<!-- 更新排班记录 -->
+	<update id="update" parameterType="com.bjxc.school.CoachDuty">
+		update tcoachduty
+		set
+			publish=#{subject}
+			,rest=#{rest}
+			,f6=#{f6}
+			,f7=#{f7}
+			,f8=#{f8}
+			,f9=#{f9}
+			,f10=#{f10}
+			,f11=#{f11}
+			,f12=#{f12}
+			,f13=#{f13}
+			,f14=#{f14}
+			,f15=#{f15}
+			,f16=#{f16}
+			,f17=#{f17}
+			,f18=#{f18}
+			,f19=#{f19}
+			,f20=#{f20}
+			,f21=#{f21}
+		where coachid=#{coachId}
+			and day=#{day}
+		;
+	</update>
+	
+	<!-- 批量创建排班记录 -->
+	<insert id="insertCoachDutyList" parameterType="java.util.List">
+		insert into tcoachDuty
+		(coachId,day,f6,f7,f8,f9,f10,f11,f12,f13,f14,f15,f16,f17,
+		f18,f19,f20,f21,rest,publish)
+		VALUES
+		<foreach collection="list" item="obj" index="index" separator=",">
+			(#{obj.coachId},#{obj.day},#{obj.f6},#{obj.f7},#{obj.f8},#{obj.f9},
+			#{obj.f10},#{obj.f11},#{obj.f12},#{obj.f13},#{obj.f14},#{obj.f15},#{obj.f16},
+			#{obj.f17},#{obj.f18},#{obj.f19},#{obj.f20},#{obj.f21},#{obj.rest},#{obj.publish})
+		</foreach>
+	</insert>
+	
+	<insert id="add" parameterType="com.bjxc.school.CoachDuty" useGeneratedKeys="true" keyProperty="id">
+		insert into tcoachDuty
+		(coachId,day,f6,f7,f8,f9,f10,f11,f12,f13,f14,f15,f16,f17,f18,f19,f20,f21,Rest,Publish,Remarks) 
+		VALUES(
+		#{coachId},#{day}
+		,#{f6},#{f7},#{f8},#{f9},#{f10},#{f11},#{f12},#{f13},#{f14}
+		,#{f15},#{f16},#{f17},#{f18},#{f19},#{f20},#{f21}
+		,#{rest},#{subject},#{remarks})
+	</insert>
+	
+	<select id="searchCoach" resultType="com.bjxc.school.CoachDuty">
+		select * from tcoachDuty
+		where coachId=#{coachId}
+			and day=#{time}
+		limit 1;
+	</select>
+	
+</mapper>

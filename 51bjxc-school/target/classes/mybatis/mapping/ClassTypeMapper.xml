@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.ClassTypeMapper">
+
+
+	<!--练车场地信息搜索栏 -->
+	<select id="list" resultType="com.bjxc.school.ClassType">
+		SELECT * FROM TClassType 
+		<where>
+			insId = #{insId} 
+			<if test="searchText != null">
+				name  like CONCAT(CONCAT('%',#{searchText}), '%')
+			</if>
+		</where>
+	</select>
+	
+	<!-- 添加数据 -->
+	<insert id="add" parameterType="com.bjxc.school.ClassType">
+		insert into
+		tClassType(insId,classcurr,status,description,
+		price,vehicletype,coachType,drvingType,photo,
+		resRegular,paymode,seq,uptime,subject,
+		trainningtime,trainningmode,service,chargemode,isProvince)
+		value(#{insId},#{classcurr},
+		#{status},#{description},#{price},
+		#{vehicletype},#{coachType},#{drvingType},#{photo},
+		#{resRegular},#{paymode},#{seq},#{uptime},#{subject},
+		#{trainningtime},#{trainningmode},#{service},#{chargemode},#{isProvince})
+		<selectKey keyProperty="id" resultType="Integer">
+			select
+			last_insert_id() as id
+		</selectKey>
+	</insert>
+
+
+	<!-- 修改练车场地信息 -->
+	<update id="update" parameterType="com.bjxc.school.ClassType">
+		update TClassType
+		<set>
+			<if test="insId != null">
+                insId = #{insId},
+			</if>
+			<if test="classcurr != null">
+                classcurr = #{classcurr},
+			</if>
+			<if test="shuttle != null">
+                shuttle = #{shuttle},
+			</if>
+			<if test="status != null">
+                status = #{status},
+			</if>
+			<if test="description != null">
+                description = #{description},
+			</if>
+			<if test="price != null">
+                price = #{price},
+			</if>
+			<if test="vehicletype != null">
+                vehicletype = #{vehicletype},
+			</if>
+			<if test="coachType != null">
+                coachType = #{coachType},
+			</if>
+			<if test="drvingType != null">
+                drvingType = #{drvingType},
+			</if>
+			<if test="photo != null">
+                Photo = #{photo},
+			</if>
+			<if test="resRegular != null">
+                ResRegular = #{resRegular},
+			</if>
+			<if test="paymode != null">
+                paymode = #{paymode},
+			</if>
+			<if test="seq != null">
+                seq = #{seq},
+			</if>
+			<if test="uptime != null">
+                uptime = #{uptime},
+			</if>
+			<if test="subject != null">
+                subject = #{subject},
+			</if>
+			<if test="trainningtime != null">
+                trainningtime = #{trainningtime},
+			</if>
+			<if test="trainningmode != null">
+                trainningmode = #{trainningmode},
+			</if>
+			<if test="chargemode != null">
+                chargemode = #{chargemode},
+			</if>
+			<if test="service != null">
+                service = #{service},
+			</if>
+			<if test="isProvince != null">
+                isProvince = #{isProvince}
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	<!--练车场地信息搜索栏 -->
+	<select id="getList" resultType="com.bjxc.school.ClassType">
+		SELECT * FROM TClassType 
+		<where>
+			insId = #{insId} 
+			and Status=1
+		</where>
+	</select>
+	
+	<select id="Incrementselect" resultType="com.bjxc.school.ClassType">
+     select max(seq) as seq,insId  from tClassType where insId=#{insId}
+	</select>
+</mapper>

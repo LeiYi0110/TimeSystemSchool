@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.TRoleAuthMapper">
+	<select id="getRoleAuth" resultType="com.bjxc.school.RoleAuth">
+		select * from troleauth 
+		where roleid=#{roleId}
+	</select>
+	
+	<insert id="add" parameterType="com.bjxc.school.RoleAuth" >
+		insert into troleauth
+		(roleid,operationItemId)
+		values
+		<foreach collection="list" item="item" separator=",">
+			(#{item.roleId},#{item.operationItemId})
+		</foreach>
+	</insert>
+	
+	<delete id="delete" parameterType="com.bjxc.school.RoleAuth">
+		delete from troleauth
+		where id in (
+		<foreach collection="list" item="item" separator=",">
+			#{item.id}
+		</foreach>
+		)
+	</delete>
+	
+	<delete id="deleteByRoleId" parameterType="int">
+		delete from troleauth
+		where roleid = #{roleId}
+	</delete>
+</mapper>

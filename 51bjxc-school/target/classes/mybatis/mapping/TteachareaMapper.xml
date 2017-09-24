@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.TteachareaMapper">
+<!-- 查询教学区域 -->
+	<select id="tteacharlist" resultType="com.bjxc.school.Tteacharea">
+		select * from tteacharea where  insId=#{insId} 
+			<if test="searchText != null">
+			and 
+			 name like CONCAT(CONCAT('%',#{searchText}),'%')
+			</if>
+		LIMIT #{start},#{size}
+	</select>
+	
+	
+	<select id="counteachar" resultType="java.lang.Integer"> 
+		SELECT count(1) from tteacharea  where insId=#{insId} 
+			<if test="searchText != null">
+			and 
+			 name like CONCAT(CONCAT('%',#{searchText}),'%')
+			</if>
+	</select>
+	
+	
+	
+	
+	<!-- 新增教学区域 -->
+     <insert id="add" parameterType="com.bjxc.school.Tteacharea">
+        insert into tteacharea(name,perdritype,insId,createtime,astatus)
+		Values(#{name},#{perdritype},#{insId},now(),1)
+     </insert>
+     
+     <!-- 修改教学区域 -->
+     <update id="update" parameterType="com.bjxc.school.Tteacharea">
+       update tteacharea
+       <set>
+       		<if test="name !=null">
+				name=#{name},
+			</if>
+			<if test="perdritype !=null">
+				perdritype=#{perdritype},
+			</if>
+			<if test="insId !=null">
+				insId=#{insId}
+			</if>
+		where id=#{id}
+       </set>
+     </update>
+     
+     
+     <!-- 禁用教学区域 -->
+     <update id="disable" parameterType="com.bjxc.school.Tteacharea">
+		update  tteacharea set astatus=0 where id=#{id}
+     
+     </update>
+     
+     <select id="get" resultType="com.bjxc.school.Tteacharea">
+       select * from tteacharea where id=#{id}
+     </select>
+ 
+     <select id="selectdow" resultType="com.bjxc.school.Tteacharea">
+     select * from tteacharea where astatus=1 and insId=#{insId}
+     </select>
+</mapper>

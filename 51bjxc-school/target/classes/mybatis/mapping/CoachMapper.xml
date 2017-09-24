@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.CoachMapper">
+
+	<select id="list" resultType="com.bjxc.school.Coach">
+		SELECT c.*,s.StationId,rc.licnum as rLicnum,se.Name as stationName FROM TCoach c 
+		left join TCoachService s on s.CoachId=c.id 
+		left join trainingcar rc on c.ID=rc.coachId
+		left join TServiceStation se on s.StationId=se.id
+		<where>
+				c.insId=#{insId}
+			<if test="searchText != null">
+				and	(c.Mobile like CONCAT(CONCAT('%',#{searchText}), '%')
+				or c.Name like CONCAT(CONCAT('%',#{searchText}), '%')
+				or c.Idcard like CONCAT(CONCAT('%',#{searchText}), '%'))
+			</if>
+			<if test="stationId != null">
+				and s.StationId=#{stationId}
+			</if>
+			
+		</where>
+		order by c.id desc LIMIT #{start},#{size}
+	</select>
+	
+	<select id="dutyList" resultType="com.bjxc.school.CoachDuty">
+		select d.*,c.`Name`,c.`Subject` 
+		from tcoachduty d 
+			left join tcoach c on d.coachid = c.id
+		<if test="(areaId != null and areaId != 0) or (stationId != null and stationId != 0)">
+			left join tcoachservice tcs on tcs.coachid = c.id
+			
+		</if>
+		<if test="areaId != null and areaId != 0">
+			left join tservicestation tst on tst.id = tcs.stationid	
+		</if>
+			where c.id=d.CoachId  
+			and d.day>=#{now}
+		<if test="future != null">
+			and d.day &lt;= #{future}
+		</if>
+		
+		<if test="coachId != null and coachId != 0">
+			and c.id = #{coachId}
+		</if>
+		<if test="stationId != null and stationId != 0">
+			and tcs.StationId=#{stationId}
+		</if>
+		<if test="areaId != null and areaId != 0">
+			and tst.areaid = #{areaId}
+		</if>
+		<if test="searchText != null and !searchText.equals(&quot; &quot;)">
+				and	(c.Mobile like CONCAT(CONCAT('%',#{searchText}), '%')
+				or c.Name like CONCAT(CONCAT('%',#{searchText}), '%')
+				or c.Idcard like CONCAT(CONCAT('%',#{searchText}), '%'))
+		</if>
+		<if test="insId != null and insId != 0">
+			and c.insId = #{insId}
+		</if>
+		
+			order by d.Day 
+		<if test="start != null">
+			LIMIT #{start},#{size}
+		</if>
+	</select>
+
+	<!-- <select id="dutyList" resultType="com.bjxc.school.CoachDuty">
+		select d.*,c.`Name`,c.`Subject` from tcoachduty d,tcoach c
+		<if test="stationId != null">
+			,TCoachService s
+		</if>
+		where c.id=d.CoachId and d.Day>=#{day}
+		<if test="stationId != null">
+			and s.StationId=#{stationId} and s.CoachId=d.CoachId
+		</if>
+		<if test="insId != null">
+			and c.insId=#{insId}
+		</if>
+		<if test="searchText != null">
+			and c.`Name` like CONCAT(CONCAT('%',#{searchText}), '%')
+		</if>
+		<if test="day != null">
+			and d.day>=#{day}
+		</if>
+		<if test="time1!=null">
+			and d.day>=#{time1} and d.day &lt;= #{time2}
+		</if>
+		order by d.Day LIMIT #{start},#{size}
+	</select> -->
+
+	<select id="totalDuty" resultType="Integer">
+		select count(1) 
+		from tcoachduty d 
+			left join tcoach c on d.coachid = c.id
+		<if test="(areaId != null and areaId != 0) or (stationId != null and stationId != 0)">
+			left join tcoachservice tcs on tcs.coachid = c.id
+			
+		</if>
+		<if test="areaId != null and areaId != 0">
+			left join tservicestation tst on tst.id = tcs.stationid	
+		</if>
+
+			where c.id=d.CoachId  
+			and d.day>=#{now}
+		<if test="future != null">
+			and d.day &lt;= #{future}
+		</if>
+		
+		<if test="coachId != null and coachId != 0">
+			and c.id = #{coachId}
+		</if>
+		<if test="stationId != null and stationId != 0">
+			and tcs.StationId=#{stationId}
+		</if>
+		<if test="areaId != null and areaId != 0">
+			and tst.areaid = #{areaId}
+		</if>
+		<if test="insId != null and insId != 0">
+			and c.insId = #{insId}
+		</if>
+		<if test="searchText != null and !searchText.equals(&quot; &quot;)">
+				and	(c.Mobile like CONCAT(CONCAT('%',#{searchText}), '%')
+				or c.Name like CONCAT(CONCAT('%',#{searchText}), '%')
+				or c.Idcard like CONCAT(CONCAT('%',#{searchText}), '%'))
+		</if>
+	</select>
+
+	<!-- 根据教练和时间查找预约的学生姓名 -->
+	<select id="dutyStu" resultType="java.util.HashMap">
+		select s.`Name` as
+			stuName,i.time,s.mobile as mobile,s.id as id
+			, tpu.username as optionUserName
+			, r.reserveRole as reserveRole
+			, c.name as coachName
+		from tstudentreserve r
+			inner JOIN tstudentreserveinfo i on r.id = i.ReserveId 
+			LEFT JOIN tcoach c on r.CoachId=c.ID
+			LEFT JOIN tstudent s on s.ID=r.StudentId
+			left join TPlatformUser tpu on (tpu.id = r.optionUserId and r.reserveRole = 3)
+		where i.`Day`=#{day} and
+			r.CoachId=#{coachId} and i.status in (0,1,2)
+			and r.status != -1
+	</select>
+
+	<select id="total" resultType="Integer">
+		SELECT count(1) FROM TCoach c
+		left join TCoachService s on
+		s.CoachId=c.id
+		<where>
+				insId=#{insId}
+			<if test="searchText != null">
+				and (Mobile like CONCAT(CONCAT('%',#{searchText}), '%')
+				or Name like CONCAT(CONCAT('%',#{searchText}), '%')
+				or Idcard like CONCAT(CONCAT('%',#{searchText}), '%'))
+			</if>
+			<if test="stationId != null">
+				and s.StationId=#{stationId}
+			</if>
+			
+		</where>
+		
+	</select>
+
+
+	<select id="coachList" resultType="com.bjxc.school.Coach"
+		parameterType="java.util.Map">
+		select c.Name,c.ID from TCoach c left join TCoachService s on
+		s.CoachId = c.ID
+		<where>
+			and c.insId = #{insId}
+			<if test="stationId != null">
+				and s.StationId=#{stationId}
+			</if>
+			<if test="subjectId != null">
+				and c.`Subject` in (#{subjectId},0)
+			</if>
+		</where>
+	</select>
+
+	<insert id="add" parameterType="com.bjxc.school.Coach"
+		useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO `TCoach` (`InsId`,
+		`userid`, `Name`, `Sex`, `Idcard`, `Mobile`, `Address`, `Photo`,
+		`Fingerprint`,
+		`Drilicence`, `Occupationlevel`, `Dripermitted`, `Teachpermitted`,
+		`Employstatus`, `Hiredate`, `Leavedate`, `Coachnum`, `Star`,
+		`CreateTime`, `birth`, `DrivingTime`, `CarBrand`,
+		`CarPlate`,`Subject`,`ReceiveTime`,`Language`,drivingFieldId,Occupationno,isCountry,isProvince)
+		VALUES (#{insId},#{userId}, #{name}, #{sex}, #{idcard}, #{mobile},
+		#{address}, #{photo}, NULL, #{drilicence}, #{occupationlevel},
+		#{dripermitted}, #{teachpermitted}, #{employstatus}, #{hiredate},
+		NULL, #{coachnum}, #{star}, now(),
+		#{birth}, #{drivingTime}, #{carBrand},
+		#{carPlate},#{subject},#{receiveTime},#{language},#{drivingFieldId},#{occupationno},#{isCountry},#{isProvince});
+	</insert>
+	
+	<insert id="addByExcel" parameterType="com.bjxc.school.Coach" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO `TCoach` (`InsId`, `userid`, `Name`, `Sex`, `Idcard`, `Mobile`, `Address`, `Photo`, `Fingerprint`, 
+			`Drilicence`, `Occupationlevel`, `Dripermitted`, `Teachpermitted`, 
+			`Employstatus`, `Hiredate`, `Leavedate`, `Coachnum`, `Star`,
+			`CreateTime`, `birth`, `DrivingTime`, `CarBrand`, `CarPlate`,`Subject`,`ReceiveTime`) 
+			VALUES (#{insId},#{userId}, #{name}, #{sex}, #{idcard}, #{mobile}, #{address}, NULL, NULL, #{drilicence}, #{occupationlevel}, 
+			#{dripermitted}, #{teachpermitted}, #{employstatus}, #{hiredate}, NULL, #{coachnum}, #{star}, now(), 
+			#{birth}, #{drivingTime}, #{carBrand}, #{carPlate},#{subject},#{receiveTime});
+	</insert>
+
+	<update id="update" parameterType="com.bjxc.school.Coach">
+		update TCoach
+		<set>
+			<if test="sex != null">
+				sex=#{sex},
+			</if>
+			<if test="name != null">
+				name=#{name},
+			</if>
+			<if test="mobile != null">
+				mobile=#{mobile},
+			</if>
+			<if test="idcard != null">
+				idcard=#{idcard},
+			</if>
+			<if test="photo != null">
+				photo=#{photo},
+			</if>
+			<if test="address != null">
+				address=#{address},
+			</if>
+			<if test="drilicence != null">
+				drilicence=#{drilicence},
+			</if>
+			<if test="dripermitted != null">
+				dripermitted=#{dripermitted},
+			</if>
+			<if test="teachpermitted != null">
+				teachpermitted=#{teachpermitted},
+			</if>
+			<if test="coachnum != null">
+				coachnum=#{coachnum},
+			</if>
+			<if test="occupationlevel != null">
+				occupationlevel=#{occupationlevel},
+			</if>
+			<if test="employstatus != null">
+				employstatus=#{employstatus},
+			</if>
+			<if test="star != null">
+				star=#{star},
+			</if>
+			<if test="birth != null">
+				birth=#{birth},
+			</if>
+			<if test="hiredate != null">
+				hiredate=#{hiredate},
+			</if>
+			<if test="leavedate != null">
+				leavedate=#{leavedate}, UserId=null,
+			</if>
+			<if test="drivingTime != null">
+				drivingTime=#{drivingTime},
+			</if>
+			<if test="createTime != null">
+				createTime=#{createTime},
+			</if>
+			<if test="carBrand != null">
+				carBrand=#{carBrand},
+			</if>
+			<if test="carPlate != null">
+				carPlate=#{carPlate},
+			</if>
+			<if test="subject != null">
+				Subject=#{subject},
+			</if>
+			<if test="receiveTime != null">
+				ReceiveTime=#{receiveTime},
+			</if>
+			<if test="language != null">
+				language=#{language},
+			</if>
+			<if test="drivingFieldId != null">
+				drivingFieldId=#{drivingFieldId},
+			</if>
+			<if test="occupationno != null">
+				occupationno=#{occupationno},
+			</if>
+			<if test="isCountry != null">
+				isCountry=#{isCountry},
+			</if>
+			<if test="isProvince != null">
+				isProvince=#{isProvince}
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+
+	<update id="updateDuty" parameterType="java.util.Map">
+		update tcoachduty
+		<set>
+			<if test="time==6">
+				f6=#{status}
+			</if>
+			<if test="time==7">
+				f7=#{status}
+			</if>
+			<if test="time==8">
+				f8=#{status}
+			</if>
+			<if test="time==9">
+				f9=#{status}
+			</if>
+			<if test="time==10">
+				f10=#{status}
+			</if>
+			<if test="time==11">
+				f11=#{status}
+			</if>
+			<if test="time==12">
+				f12=#{status}
+			</if>
+			<if test="time==13">
+				f13=#{status}
+			</if>
+			<if test="time==14">
+				f14=#{status}
+			</if>
+			<if test="time==15">
+				f15=#{status}
+			</if>
+			<if test="time==16">
+				f16=#{status}
+			</if>
+			<if test="time==17">
+				f17=#{status}
+			</if>
+			<if test="time==18">
+				f18=#{status}
+			</if>
+			<if test="time==19">
+				f19=#{status}
+			</if>
+			<if test="time==20">
+				f20=#{status}
+			</if>
+			<if test="time==21">
+				f21=#{status}
+			</if>
+			<!-- ,publish=1  -->
+		</set>
+		where CoachId=#{coachId} and Day=#{day}
+	</update>
+
+	<select id="exportCoachList" resultType="com.bjxc.school.Coach">
+		SELECT c.*,s.StationId,rc.licnum as rLicnum,se.Name as stationName FROM TCoach c 
+		left join TCoachService s on s.CoachId=c.id 
+		left join trainingcar rc on c.ID=rc.coachId
+		left join TServiceStation se on s.StationId=se.id
+		<where>
+			c.insId = #{insId}
+			<if test="stationId != null and stationId != 0">
+				and s.StationId = #{stationId}  
+				and s.CoachId = c.id 
+			</if> 
+		</where>
+	</select>
+	
+	<select id="getDay" resultType="java.util.Date">
+		select day from tcoachduty 
+			where Day>=date_format(#{day},'%Y-%m-%d') and CoachId=#{coachId}
+	</select>
+	
+	<!-- 教练概况 -->
+	<parameterMap type="map" id="NumberMap">
+		<parameter property="insId" jdbcType="INTEGER" mode="IN" />
+		<parameter property="stationId" jdbcType="INTEGER" mode="IN" />
+		<parameter property="coaMonth" jdbcType="INTEGER" mode="IN" />
+		<parameter property="start" jdbcType="INTEGER" mode="IN" />
+		<parameter property="size" jdbcType="INTEGER" mode="IN" />
+		<parameter property="coaTCount" jdbcType="INTEGER" mode="OUT" />
+	</parameterMap>
+	
+    <select id="getCoachSituation" parameterMap="NumberMap" resultType="com.bjxc.school.CoachTable" statementType="CALLABLE">
+	    {call 51bjxc.coach_situation(
+	    	?,?,?,?,?,?
+	    )}
+	</select>
+    
+    
+    <!-- 根据条件获取教练列表 -->
+    <select id="getCoachCollector" resultType="com.bjxc.school.Coach">
+    	SELECT c.*,s.StationId,se.Name as stationName 
+    	FROM TCoach c 
+			left join TCoachService s on s.CoachId=c.id 
+			left join TServiceStation se on s.StationId=se.id
+		<where>
+			c.insId=#{insId}
+			<if test="coachId != null and coachId != 0">
+				and c.id = #{coachId}
+			</if>
+			<if test="searchText != null and !searchText.equals(&quot;&quot;)">
+				and	(c.Mobile like CONCAT(CONCAT('%',#{searchText}), '%')
+				or c.Name like CONCAT(CONCAT('%',#{searchText}), '%')
+				or c.Idcard like CONCAT(CONCAT('%',#{searchText}), '%'))
+			</if>
+			<if test="stationId != null and stationId != 0">
+				and s.StationId=#{stationId}
+			</if>
+			<if test="areaId != null and areaId != 0">
+				and se.areaid = #{areaId}
+			</if>
+		</where>
+		
+		<if test="start != null and size != null">
+			LIMIT #{start},#{size}
+		</if>
+    </select>
+    
+    <!-- getCoachCollector 在没有页号的总数 -->
+    <select id="getCoachCollectorTotal" resultType="Integer">
+    	SELECT count(1)
+    	FROM TCoach c 
+			left join TCoachService s on s.CoachId=c.id 
+			left join TServiceStation se on s.StationId=se.id
+		<where>
+			c.insId=#{insId}
+			<if test="coachId != null and coachId != 0">
+				and c.id = #{coachId}
+			</if>
+			<if test="searchText != null and !searchText.equals( &quot;  &quot; )">
+				and	(c.Mobile like CONCAT(CONCAT('%',#{searchText}), '%')
+				or c.Name like CONCAT(CONCAT('%',#{searchText}), '%')
+				or c.Idcard like CONCAT(CONCAT('%',#{searchText}), '%'))
+			</if>
+			<if test="stationId != null and stationId != 0">
+				and s.StationId=#{stationId}
+			</if>
+			
+			<if test="areaId != null and areaId != 0">
+				and se.areaid = #{areaId}
+			</if>
+		</where>
+    </select>
+    
+    <select id="getStationCoach" resultType="com.bjxc.school.Coach">
+    	select a.* 
+    	from tcoach a
+    		left join TCoachService b on a.id = b.coachid
+    	where b.stationId = #{stationId}
+    		and a.employstatus = 0;
+    </select>
+    
+    <select id="getByCoachNum" resultType="com.bjxc.school.Coach">
+    	select * from tcoach 
+    	where coachnum=#{coachNum} and name=#{coachName}
+    	limit 1;
+    </select>
+    
+</mapper>

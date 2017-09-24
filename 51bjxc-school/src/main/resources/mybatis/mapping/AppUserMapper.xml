@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.AppUserMapper">
+	 <resultMap type="com.bjxc.school.AppUser" id="appUserMap">  
+        <id property="id" column="ID"/>  
+        <result property="mobile" column="Mobile"/>  
+        <result property="headimg" column="Headimg"/>  
+        <result property="idCard" column="Idcard"/>  
+        <result property="sex" column="Sex"/>  
+        <result property="userName" column="UserName"/>  
+        <result property="status" column="Status"/>  
+        <result property="role" column="Urole"/>  
+    </resultMap>  
+    
+	<insert id="addUser" parameterType="com.bjxc.school.AppUser" useGeneratedKeys="true" keyProperty="id">
+		insert into tuser(Mobile,Password,Urole,CreateTime,Sex,UserName,IdCard) value(#{mobile},#{password},#{role},NOW(),#{sex},#{userName},#{idCard})
+	</insert>
+	
+	<update id="update" parameterType="com.bjxc.school.AppUser">
+		update tuser 
+		<set>
+			<if test="mobile != null">
+				mobile=#{mobile}, 
+			</if>
+			<if test="role != null">
+				Urole=#{role}, 
+			</if>
+			<if test="sex != null">
+				sex=#{sex}, 
+			</if>
+			<if test="userName != null">
+				userName=#{userName}, 
+			</if>
+			<if test="idCard != null">
+				IdCard=#{idCard}, 
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+
+	<select id="get" resultMap="appUserMap">
+		SELECT * FROM tuser 
+		<where>
+			<if test="id != null">
+				and id = #{id}
+			</if>
+			<if test="mobile != null">
+				and mobile = #{mobile}
+			</if>
+		
+		</where>
+	</select>
+</mapper>

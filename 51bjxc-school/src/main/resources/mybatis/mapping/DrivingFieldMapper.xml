@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.DrivingFieldMapper">
+
+
+	<!--练车场地信息搜索栏 -->
+	<select id="list" resultType="com.bjxc.school.DrivingField">
+	select
+		id,insId,name,seq,ttname,Address,AreaSize,Area,vehicletype,Location,totalvehnum,curvehnum,Status,areaId,type,isProvince,isNotice,reason
+		from (SELECT d.id,d.insId as insId,d.name as name ,d.seq as seq,e.`name` as
+		ttname,d.Address as Address,d.AreaSize as areasize,
+		d.Area as Area,d.vehicletype as vehicletype,d.Location as
+		Location,d.totalvehnum as totalvehnum,d.curvehnum as
+		curvehnum,d.Status as Status,d.areaId as areaId,d.type as type,d.isProvince,d.isNotice,d.reason
+		FROM TDrivingField d
+		LEFT JOIN tteacharea e on e.id=d.areaId
+		) views  
+		<where>
+			insId =#{insId}
+		<if test="searchText != null">
+			and (address like CONCAT(CONCAT('%',#{searchText}), '%')
+			or
+			name like CONCAT(CONCAT('%',#{searchText}), '%'))
+		</if>
+		</where>
+		<if test="start!=null">
+			order by id desc limit #{start},#{size}
+		</if>
+			
+		<!-- SELECT * FROM TDrivingField WHERE address LIKE '%${address}%'; -->
+	</select>
+	
+	<select id="total" resultType="Integer">
+		
+
+		select
+		count(*)
+		from (SELECT d.id,d.insId as insId,d.name as name ,d.seq as seq,e.`name` as
+		ttname,d.Address as Address,d.AreaSize as areasize,
+		d.Area as Area,d.vehicletype as vehicletype,d.Location as
+		Location,d.totalvehnum as totalvehnum,d.curvehnum as
+		curvehnum,d.Status as Status,d.areaId as areaId,d.type as type
+		FROM TDrivingField d
+		LEFT JOIN tteacharea e on e.id=d.areaId
+		and Status = 1) views 
+		<where>
+				insId =#{insId}
+		<if test="searchText != null">
+			and (address like CONCAT(CONCAT('%',#{searchText}), '%')
+			or
+			name like CONCAT(CONCAT('%',#{searchText}), '%'))
+		</if>
+		</where>
+	</select>
+
+	<!-- 添加数据
+	<insert id="add" parameterType="com.bjxc.school.DrivingField">
+		insert into
+		tdrivingfield(name,InsId,address,location,Area,AreaSize,vehicletype,totalvehnum,curvehnum,areaId,seq,type,inscode,isCountry)
+		values(#{name},#{insId},#{address},#{location},#{area},#{areasize},#{vehicletype},#{totalvehnum},#{curvehnum},#{areaId},#{seq},#{type},#{inscode},#{isCountry})
+		<selectKey keyProperty="id" resultType="Integer">
+			select
+			last_insert_id() as id
+		</selectKey>
+	</insert> -->
+	<insert id="add" parameterType="com.bjxc.school.DrivingField">
+		insert into
+		tdrivingfield(name,InsId,address,location,Area,AreaSize,vehicletype,totalvehnum,curvehnum,areaId,seq,type,isProvince)
+		values(#{name},#{insId},#{address},#{location},#{area},#{areasize},#{vehicletype},#{totalvehnum},#{curvehnum},#{areaId},#{seqint},#{type},#{isProvince})
+		<selectKey keyProperty="id" resultType="Integer">
+			select
+			last_insert_id() as id
+		</selectKey>
+	</insert>
+
+
+	<!-- 修改练车场地信息 -->
+	<update id="update" parameterType="com.bjxc.school.DrivingField">
+		update TDrivingField
+		<set>
+			<if test="name != null">
+				name = #{name},
+			</if>
+			<if test="area != null">
+				area = #{area},
+			</if>
+			<if test="totalvehnum != null">
+				totalvehnum = #{totalvehnum},
+			</if>
+			<if test="curvehnum != null">
+				curvehnum = #{curvehnum},
+			</if>
+			<if test="address != null">
+				address = #{address},
+			</if>
+			<if test="location != null">
+				location = #{location},
+			</if>
+			<if test="vehicletype != null">
+				vehicletype = #{vehicletype},
+			</if>
+			<if test="areasize != null">
+				areasize = #{areasize},
+			</if>
+			<if test="areaId != null">
+				areaId = #{areaId},
+			</if>
+			<if test="type != null">
+				type = #{type}
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+
+	<!--导出练车场地信息 -->
+	<select id="carlist" resultType="com.bjxc.school.DrivingField">
+			select
+		id,insId,name,seq,ttname,Address,AreaSize,Area,vehicletype,Location,totalvehnum,curvehnum,Status,areaId
+		from (SELECT d.id,d.insId as insId,d.name as name ,d.seq as seq,e.`name` as
+		ttname,d.Address as Address,d.AreaSize as areasize,
+		d.Area as Area,d.vehicletype as vehicletype,d.Location as
+		Location,d.totalvehnum as totalvehnum,d.curvehnum as
+		curvehnum,d.Status as Status,d.areaId as areaId
+		FROM TDrivingField d
+		LEFT JOIN tteacharea e on e.id=d.areaId
+		and Status = 1) views where 1=1  and insId=#{insId}
+	</select>
+	
+	<update id="updatestatus" parameterType="com.bjxc.school.DrivingField">
+		update TDrivingField set STATUS=0,isProvince=#{isProvince} where id=#{id}
+	</update>
+
+	<select id="Incrementselect" resultType="com.bjxc.school.DrivingField">
+     select max(seq) as seq,insId from TDrivingField
+	</select>
+</mapper>

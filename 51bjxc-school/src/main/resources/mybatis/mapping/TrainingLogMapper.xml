@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.TrainingLogMapper">
+	<select id="getList" resultType="com.bjxc.school.TrainingLog">
+		select tl.*,rl.engine_speed as enginespeed,ts.name ,tr.subjectId
+			,rl.status as locationStatus
+			,rl.carSpeed as carSpeed
+			,rl.gpsSpeed as gpsSpeed
+			,(
+				select count(1)
+				from tdeviceimage img
+				where DATE_FORMAT(img.createtime,'%Y-%m-%d-%H-%i') = DATE_FORMAT (tl.recordtime,'%Y-%m-%d-%H-%i')
+					and img.trainingRecordId = tl.trainingrecordid
+			) as imageCount
+		from TrainingLog tl 
+		left join trainingrecord tr on tl.trainingrecordid=tr.id
+		left join rlocationinfo rl on tl.locationinfoid=rl.id
+		left join tstudent ts on tl.studentnum = ts.stunum
+		<where>
+			<if test="propass != null and propass != ''">
+				and tl.propass=#{propass}
+			</if>
+			<if test="inspass != null and inspass != ''">
+				and tl.inspass=#{inspass}
+			</if>
+			<if test="recordId != null">
+				and tr.id=#{recordId}
+			</if>
+			<if test="stunum != null">
+				and (tl.studentnum=#{stunum} or ts.name like CONCAT(CONCAT('%',#{stunum}), '%') or ts.Idcard=#{stunum})
+			</if>
+			<if test="day != null and day != ''">
+				and date_format(tl.recordtime,'%Y%m%d')=date_format(#{day},'%Y%m%d')
+			</if>
+			<if test="subjectId != null and subjectId != ''">
+				and tr.subjectId=#{subjectId}
+			</if>
+		</where>
+		order by tl.recordtime desc
+	</select>
+	
+	<select id="getLong" resultType="java.util.Map">
+		select latitude,longtitude from rlocationinfo rl 
+		where rl.id in (select locationinfoid from traininglog where trainingrecordid=#{recordId})
+	</select>
+	
+	<select id="getLongs" resultType="String">
+		select id from trainingrecord as tr ,
+		(select studentId,subjectId from trainingrecord where id=#{id}) as a 
+		where 
+		tr.studentId=a.studentId and tr.subjectId=a.subjectId and id!=#{id}
+	</select>
+	
+	<select id="getLongAll" resultType="java.util.Map">
+		select b.id as recordId 
+			,a.latitude as latitude , a.longtitude as longtitude
+			,e.Location as drivingFieldLocation 
+			,a.time as recordtime
+		from rlocationinfo a
+			left join trainingrecord b on a.trainingrecordid = b.id
+			left join tcoach d on d.id = b.coachid
+			left join tdrivingfield e on e.id = d.DrivingFieldID
+		where b.studentId = #{studentId} and b.subjectId = #{subjectId}
+		order by a.time
+		
+	</select>
+	
+	<select id="getGraduation" resultType="java.util.HashMap">
+	
+SELECT
+	t.stunum AS studentnum,
+	t.name AS stuname,
+	tr.subjectId,	
+	SUM(
+		TIMESTAMPDIFF(MINUTE, tr.startTime, tr.endTime)
+	) AS parttime,
+	SUM(tr.mileage) AS partmile,
+	tr.subjectId AS mtime,
+	tr.subjectId AS mmile
+FROM
+	trainingrecord tr
+LEFT JOIN tstudent t ON t.id = tr.studentId
+WHERE
+	t.name like #{stuname}
+GROUP BY
+	subjectId	
+
+	</select>
+	
+	<update id="batchUpdatePass">
+		update TrainingLog 
+		set inspass = #{pass} ,inreason = #{inreason}
+		where id in (
+		<foreach collection="list" item="item" separator=",">
+			#{item}
+		</foreach>
+		)
+	</update>
+	
+	<select id="getTrainingLogImage" resultType="java.util.HashMap">
+		select tlog.id as trainingId,img.*
+		from tdeviceimage img
+			left join TrainingRecord tr on tr.deviceid = img.deviceId and tr.id = img.trainingRecordId
+			left join TrainingLog tlog 
+				on (DATE_FORMAT(img.createtime,'%Y-%m-%d-%H-%i') = DATE_FORMAT (tlog.recordtime,'%Y-%m-%d-%H-%i')
+					and tr.id = tlog.trainingrecordid)
+		where tlog.id = #{trainingId}
+	</select>
+	
+	<select id="getPhoto" resultType="java.util.HashMap">
+		select a.id,a.imageurl,a.createtime,a.event,a.imageNum,a.inpass,a.reason,b.studentId 
+		from tdeviceimage a
+			left join trainingrecord b on a.trainingRecordId = b.id
+		where a.trainingRecordId = #{id}
+	</select>
+</mapper>

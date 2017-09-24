@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.CommentMapper">
+
+	<select id="getIns" resultType="com.bjxc.school.Evaluation">
+		SELECT t.*,s.name as stuName
+		from tevaluationInstitution t,tstudent s
+		where s.id= t.studentId and t.insId=#{insId}
+		<if test="star != null">
+			and t.overall=#{star}
+		</if>
+	</select>
+
+	<select id="getInsInfo" resultType="com.bjxc.school.CommentInsCoach">
+		SELECT t.insId as id,i.name
+		as name,
+		(select count(1) from tevaluationInstitution where t.insId=#{insId} and
+		overall=1) as oneStar,
+		(select count(1) from tevaluationInstitution
+		where t.insId=#{insId} and overall=2) as twoStar,
+		(select count(1) from
+		tevaluationInstitution where t.insId=#{insId} and overall=3) as
+		threeStar,
+		(select count(1) from tevaluationInstitution where
+		t.insId=#{insId} and overall=4) as fourStar,
+		(select count(1) from
+		tevaluationInstitution where t.insId=#{insId} and overall=5) as
+		fiveStar,
+		(select count(1) from tevaluationInstitution where
+		t.insId=#{insId}) as sumStar,
+		(select avg(overall) from
+		tevaluationInstitution where t.insId=#{insId}) as avgStar
+		from
+		tevaluationInstitution t,TInstitution i
+		where t.insId=#{insId} and
+		t.insId=i.id group by id
+	</select>
+
+
+	<select id="getCoachInfo" resultType="com.bjxc.school.CommentInsCoach">
+		select tc.id as id,tc.name,
+		(select count(1) from TStudentReserveComment as src
+		LEFT JOIN TStudentReserveInfo as sri ON src.ResInfoId = sri.id
+		left join TStudentReserve sr on sri.ReserveId = sr.id
+		LEFT JOIN tcoach tc on tc.id=sr.coachId where tc.id=#{coachId} and
+		src.Star=1) as oneStar,
+		(select count(1) from TStudentReserveComment as src
+		LEFT JOIN TStudentReserveInfo as sri ON src.ResInfoId = sri.id
+		left join TStudentReserve sr on sri.ReserveId = sr.id
+		LEFT JOIN tcoach tc on tc.id=sr.coachId where tc.id=#{coachId} and
+		src.Star=2) as twoStar,
+		(select count(1) from TStudentReserveComment as src
+		LEFT JOIN TStudentReserveInfo as sri ON src.ResInfoId = sri.id
+		left join TStudentReserve sr on sri.ReserveId = sr.id
+		LEFT JOIN tcoach tc on tc.id=sr.coachId where tc.id=#{coachId} and
+		src.Star=3) as threeStar,
+		(select count(1) from TStudentReserveComment as src
+		LEFT JOIN TStudentReserveInfo as sri ON src.ResInfoId = sri.id
+		left join TStudentReserve sr on sri.ReserveId = sr.id
+		LEFT JOIN tcoach tc on tc.id=sr.coachId where tc.id=#{coachId} and
+		src.Star=4) as fourStar,
+		(select count(1) from TStudentReserveComment as src
+		LEFT JOIN TStudentReserveInfo as sri ON src.ResInfoId = sri.id
+		left join TStudentReserve sr on sri.ReserveId = sr.id
+		LEFT JOIN tcoach tc on tc.id=sr.coachId where tc.id=#{coachId} and
+		src.Star=5) as fiveStar,
+		(select count(1) from TStudentReserveComment as src
+		LEFT JOIN TStudentReserveInfo as sri ON src.ResInfoId = sri.id
+		left join TStudentReserve sr on sri.ReserveId = sr.id
+		LEFT JOIN tcoach tc on tc.id=sr.coachId where tc.id=#{coachId}) as
+		sumStar,
+		(select avg(src.Star) from TStudentReserveComment as src
+		LEFT JOIN TStudentReserveInfo as sri ON src.ResInfoId = sri.id
+		left join TStudentReserve sr on sri.ReserveId = sr.id
+		LEFT JOIN tcoach tc on tc.id=sr.coachId where tc.id=#{coachId}) as avgStar
+		from TStudentReserveComment as src
+		LEFT JOIN TStudentReserveInfo as sri ON src.ResInfoId = sri.id
+		left join TStudentReserve sr on sri.ReserveId = sr.id
+		LEFT JOIN tcoach tc on tc.id=sr.coachId
+		where tc.id=#{coachId}
+		GROUP BY
+		tc.id
+	</select>
+
+	<select id="getCoachId" resultType="java.lang.Integer">
+		select tc.id from
+		TStudentReserveComment as src
+		LEFT JOIN TStudentReserveInfo as sri ON src.ResInfoId = sri.id
+		left join TStudentReserve sr on sri.ReserveId = sr.id
+		LEFT JOIN tcoach tc on tc.id=sr.coachId
+		where tc.insId=#{insId}
+		GROUP BY tc.id order by count(1) desc limit 1
+	</select>
+
+
+	<select id="getCoachComment" resultType="com.bjxc.school.CoachComment">
+		select src.id as id,
+		ts.name as studentName,src.Star as star,src.comment as
+		comment,src.CreateTime as createTime
+		from TStudentReserveComment as src
+		LEFT JOIN TStudentReserveInfo as sri ON src.ResInfoId = sri.id
+		left join TStudentReserve sr on sri.ReserveId = sr.id
+		LEFT JOIN tstudent as ts ON sr.studentid = ts.id
+		WHERE sr.coachid = #{coachId}
+		order by src.CreateTime desc limit 20
+	</select>
+
+
+	<select id="getCoach" resultType="java.util.HashMap">
+		select id as result,Name as
+		title from TCoach where InsId=#{insId}
+		and Name like CONCAT(CONCAT('%',#{name}), '%') limit 10
+	</select>
+
+	<!-- 学员评价教练 -->
+	<select id="commlist" resultType="com.bjxc.school.CommentInsCoach">
+		
+	    select s.id,s.createTime,s.isCommProvince,o.name as servicename,d.idcard
+	    	,d.name as studentName,c.name as coachname,s.Star,s.comment 
+	    	,s.coachId as cCoachId
+	    	,s.resInfoId as resInfoId
+	    	,cc.name as cCoachName
+	    	,cc.id as cCoachId
+	    	,s.status as status
+		from  TStudentReserveComment s
+			LEFT JOIN TStudentReserveInfo r on s.ResInfoId = r.id 
+			LEFT JOIN TStudentReserve t	on r.ReserveId=t.id
+			LEFT JOIN TCoach    c on c.id=t.CoachId
+      		LEFT JOIN tstudent  d on d.id=s.StudentId
+			LEFT JOIN tservicestation o  on o.id=d.StationId
+			left join tcoach cc on cc.id = s.coachId
+   	 	where  d.insId=#{insId}
+    		<if test="searchText != null">
+				and (c.name like CONCAT(CONCAT('%',#{searchText}),'%')
+				or s.CreateTime like CONCAT(CONCAT('%',#{searchText}),'%'))
+			</if>
+		ORDER BY s.CreateTime DESC
+		LIMIT #{start},#{size}
+	</select>
+
+	<!-- 学员评价教练 -->
+	<select id="countcomm" resultType="Integer">
+			select count(1)
+			from  TStudentReserveComment s
+			LEFT JOIN TStudentReserveInfo r on s.ResInfoId = r.id 
+			LEFT JOIN TStudentReserve t	on r.ReserveId=t.id
+			LEFT JOIN TCoach    c on c.id=t.CoachId
+      		LEFT JOIN tstudent  d on d.id=s.StudentId
+     	 	where  d.insId=#{insId}
+     	 		<if test="searchText != null">
+			and (c.name like CONCAT(CONCAT('%',#{searchText}),'%')
+			or s.CreateTime like CONCAT(CONCAT('%',#{searchText}),'%'))
+			</if>
+			ORDER BY s.CreateTime DESC
+	</select>
+	
+	<!-- 导出学员评论教练 -->
+	<select id="exportcommlist" resultType="com.bjxc.school.CommentInsCoach">
+	    select s.createTime,o.name as servicename,d.idcard,d.name as studentName,c.name as coachname,g.starttime,g.endtime,g.duration,s.Star,s.comment 
+			from  TStudentReserveComment s
+			LEFT JOIN TStudentReserveInfo r on s.ResInfoId = r.id 
+			LEFT JOIN TStudentReserve t	on r.ReserveId=t.id
+			LEFT JOIN TCoach    c on c.id=t.CoachId
+      		LEFT JOIN tstudent  d on d.id=t.StudentId
+			LEFT JOIN rteachlog g on g.StuId=d.id
+			LEFT JOIN tservicestation o  on o.id=d.StationId
+     	 	where  c.insId=#{insId}
+	</select>
+
+	<!-- 学员评价驾校 -->
+	<!-- <select id="shcoolcomm" resultType="com.bjxc.school.Evaluation">
+		SELECT t.*,s.name as stuName,tc.name as coachname,ti.name as
+		tationname,s.idcard as idcard
+		from tevaluationInstitution
+		t,TInstitution i,tservicestation ti,tstudent s
+		LEFT JOIN
+		TStudentSubject ts on ts.StudentId=s.id
+		LEFT JOIN tcoach tc on tc.id = ts.CoachId
+		where t.insId=#{insId} and t.insId=i.id and s.id= t.studentId and
+		s.StationId = ti.id
+		<if test="searchText != null">
+			and t.evaluatetime like CONCAT(CONCAT('%',#{searchText}),
+			'%')
+		</if>
+		group by id
+		LIMIT #{start},#{size}
+	</select> -->
+	<select id="shcoolcomm" resultType="com.bjxc.school.Evaluation">
+		SELECT t.*,s.name as stuName,ti.name as tationname,s.idcard as idcard,i.Name as insName
+			from tevaluationInstitution t 
+	        inner JOIN TInstitution i on t.insId=i.id 
+			left join tstudent s on s.id = t.studentId 
+			left join tservicestation ti on ti.id=s.StationId
+		<!-- where t.insId=#{insId}  -->
+		
+		<if test="searchText != null">
+			and t.evaluatetime like CONCAT(CONCAT('%',#{searchText}),
+			'%')
+		</if>
+		<!-- group by id -->
+		order by id desc
+		LIMIT #{start},#{size}
+		
+	</select>
+
+	<!-- 学员评价驾校 -->
+	<!-- <select id="countshcoolcomm" resultType="Integer">
+		SELECT count(1)
+		from tevaluationInstitution t,TInstitution
+		i,tservicestation ti,tstudent s
+		LEFT JOIN TStudentSubject ts on
+		ts.StudentId=s.id
+		LEFT JOIN tcoach tc on tc.id = ts.CoachId
+		where t.insId=#{insId} and t.insId=i.id and s.id= t.studentId and
+		s.StationId = ti.id
+		<if test="searchText != null">
+			and t.evaluatetime like CONCAT(CONCAT('%',#{searchText}),
+			'%')
+		</if>
+	</select> -->
+	<select id="countshcoolcomm" resultType="Integer">
+		SELECT count(1) from tevaluationInstitution t 
+		inner JOIN TInstitution i on t.insId=i.id 
+		left join tstudent s on s.id = t.studentId 
+		left join tservicestation ti on ti.id=s.StationId
+		where t.insId=#{insId}
+		<if test="searchText != null">
+			and t.evaluatetime like CONCAT(CONCAT('%',#{searchText}),
+			'%')
+		</if>
+	</select>
+	
+	<!-- 导出评论驾校信息 -->
+	<select id="exportshcoolcomm" resultType="com.bjxc.school.Evaluation">
+		SELECT t.evaluatetime,s.name as stuName,s.idcard,ti.name as tationname,t.overall,t.teachlevel
+		from tevaluationInstitution t,TInstitution i,tservicestation ti,tstudent s
+		LEFT JOIN
+		TStudentSubject ts on ts.StudentId=s.id
+		LEFT JOIN tcoach tc on tc.id = ts.CoachId
+		where t.insId=#{insId} and t.insId=i.id and s.id= t.studentId and
+		s.StationId = ti.id
+	</select>
+
+	<select id="getCoachCommentlist" resultType="com.bjxc.school.CoachComment">
+		select src.id as id,
+		ts.name as studentName,src.Star as star,src.comment as
+		comment,src.CreateTime as createTime
+		from TStudentReserveComment as src
+		LEFT JOIN TStudentReserveInfo as sri ON src.ResInfoId = sri.id
+		left join TStudentReserve sr on sri.ReserveId = sr.id
+		LEFT JOIN tstudent as ts ON sr.studentid = ts.id
+		order by src.CreateTime desc limit 20
+	</select>
+	
+	
+
+
+	<!-- 查看教练详情 -->
+	<select id="coachdetails" resultType="com.bjxc.school.CoachComment">
+		select s.id,s.CreateTime,s.StudentId as stuId,d.name as
+		studentName,s.Star,s.Comment
+		from TStudentReserveComment s,TStudentReserveInfo r,TStudentReserve
+		t,tstudent d,TCoach c
+		where s.ResInfoId = r.id and r.ReserveId=t.id and s.StudentId=d.id and
+		t.CoachId=c.id and c.id=#{id}
+		ORDER BY s.CreateTime DESC
+	</select>
+	
+	<!-- 学员评价驾校 -->
+	<select id="getComm" resultType="com.bjxc.school.CommentInsCoach">
+		select d.stunum stunum,t.SubjectId reserSubjectId,c.Coachnum coachnum,c.isCountry coaIsCountry,d.isCountry stuIsCountry,s.id,s.createTime,d.idcard,d.name as studentName,c.name as coachname,s.Star,s.comment 
+			from  TStudentReserveComment s
+			LEFT JOIN TStudentReserveInfo r on s.ResInfoId = r.id 
+			LEFT JOIN TStudentReserve t	on r.ReserveId=t.id
+			LEFT JOIN TCoach    c on c.id=t.CoachId
+      		LEFT JOIN tstudent  d on d.id=s.StudentId
+			where s.id=#{id}
+	</select>
+	
+	<insert id="insertEval" parameterType="com.bjxc.school.Evaluation" >
+		insert into tevaluationInstitution
+		(studentId,insId,overall,evaluatetime,srvmanner,teachlevel,isValid)
+		values
+		(#{studentId},#{insId},#{overall},now(),#{srvmanner},#{teachlevel},#{isValid})
+	</insert>
+	
+	<insert id="insertCoachComment"  parameterType="com.bjxc.school.StudentReserveComment" >
+		
+		insert into TStudentReserveComment 
+		(StudentId,ResInfoId,Star,Comment,CreateTime,isCommProvince,coachid,status)
+		values
+		(#{studentId},#{resInfoId},#{start},#{comment},now(),#{isCommentProvince},#{coachId},#{status})
+		
+	</insert>
+	
+	<select id="countStudentCoach" resultType="int">
+		select count(1) from tstudentsubject
+		where studentid=#{studentId} and coachId = #{coachId}
+		and status in (1,2);
+	</select>
+	
+</mapper>

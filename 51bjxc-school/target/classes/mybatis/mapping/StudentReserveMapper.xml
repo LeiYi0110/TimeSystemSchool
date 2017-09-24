@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.StudentReserveMapper">
+    <update id="update" parameterType="com.bjxc.school.StudentReserve">
+    	update tstudentreserve s,tstudentreserveinfo i set s.`Status`=-1,i.`Status`=-1 
+    		where s.ID=i.ReserveId and s.CoachId=#{coachId} and s.StudentId=#{studentId} and i.`Day`=#{day} and i.time=#{time}
+    </update>
+    
+	<insert id="add" parameterType="com.bjxc.school.StudentReserve" useGeneratedKeys="true" keyProperty="id">
+		INSERT into tstudentreserve(StudentId,CoachId,Status,CreateTime,SubjectId,ReserveRole,optionUserId,PayType) 
+			value(#{studentId},#{coachId},1,now(),#{subjectId},3,#{optionUserId},#{payType})
+	</insert>
+	
+	<insert id="addInfo" parameterType="com.bjxc.school.StudentReserve">
+		INSERT into tstudentreserveinfo(ReserveId,`Day`,`Status`,time) value(#{id},#{day},1,#{time})
+	</insert>
+	
+	
+	<select id="list" resultType="com.bjxc.school.StudentReservePay">
+		SELECT sd.name studentName,sd.mobile studentMobile,
+		sri.day day,sri.time time,
+		c.name coachName,c.mobile coachMobile,
+		po.PayNO payNo,cf.Price totalFee,po.status payOrderStatus,
+		sri.id infoId,sri.status infoStatus,
+		sri.updateTime updateTime,
+		sr.status reserveStatus,sr.id reserveId
+		from tstudentreserveinfo sri
+		LEFT JOIN tstudentreserve sr ON sr.id = sri.reserveId AND sri.Status <![CDATA[ <> ]]> 0
+		LEFT JOIN tstudent sd ON sd.id = sr.StudentId
+		LEFT JOIN tcoach c ON sr.CoachId = c.ID
+		LEFT JOIN tcoachpayfirst cf ON cf.coachId = c.id
+		LEFT JOIN TPayOrder po ON po.BId = sr.ID
+		<where>
+			sd.insId = #{insId}
+			<if test="status != null">
+				and sri.status = #{status}
+			</if>
+			<if test="payType != -1 and payType != null">
+				and sr.PayType = #{payType}
+				and po.BType = #{payType}
+			</if>
+			<if test="payType == -1 and payType != null">
+				and sr.PayType = 1
+				and po.BType != 1
+			</if>
+			<if test="searchText != null">
+				and (sd.name  like CONCAT(CONCAT('%',#{searchText}), '%')
+				)
+			</if>
+			and date_format(po.createtime,'%Y-%m-%d')
+				BETWEEN date_format(#{startTime},'%Y-%m-%d') AND
+				date_format(#{endTime},'%Y-%m-%d')
+		</where>
+		ORDER BY sri.day desc,sri.time asc
+		limit ${start},${size}
+	</select>
+	
+	<select id="total" resultType="Integer">
+		SELECT count(*) 
+		from tstudentreserveinfo sri
+		LEFT JOIN tstudentreserve sr ON sr.id = sri.reserveId AND sri.Status <![CDATA[ <> ]]> 0
+		LEFT JOIN tstudent sd ON sd.id = sr.StudentId
+		LEFT JOIN tcoach c ON sr.CoachId = c.ID
+		LEFT JOIN TPayOrder po ON po.BId = sr.ID
+		<where>
+			sd.insId = #{insId}
+			<if test="status != null">
+				and sri.status = #{status}
+			</if>
+			<if test="payType != -1 and payType != null">
+				and sr.PayType = #{payType}
+				and po.BType = #{payType}
+			</if>
+			<if test="payType == -1 and payType != null">
+				and sr.PayType = 1
+				and po.BType != 1
+			</if>
+			<if test="searchText != null">
+				and (sd.name  like CONCAT(CONCAT('%',#{searchText}), '%')
+				)
+			</if>
+			and date_format(po.createtime,'%Y-%m-%d')
+				BETWEEN date_format(#{startTime},'%Y-%m-%d') AND
+				date_format(#{endTime},'%Y-%m-%d')
+		</where>
+	</select>
+	
+	
+	<update id="displayCoachReserveThisTime" parameterType="com.bjxc.school.StudentReserve">
+		update tstudentreserve s,tstudentreserveinfo i set s.`Status`=-1,i.`Status`=-1 
+    		where s.ID=i.ReserveId and s.CoachId=#{coachId} and i.`Day`=#{day} and i.time=#{time}
+	</update>
+	
+</mapper>

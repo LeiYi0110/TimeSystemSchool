@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.StudentCountMapper">
+	 <resultMap type="com.bjxc.school.StudentCount" id="StudentCountMap">
+      <result column="row_no" property="rowno" javaType="java.lang.Integer"/>
+      <result column="stati_date" property="statidate" javaType="java.lang.String"/>
+      <result column="stationId" property="stationId" javaType="java.lang.Integer"/>
+      <result column="name" property="name" javaType="java.lang.String"/>
+      <result column="new_student_count" property="newstudentcount" javaType="java.lang.Integer"/>
+      <result column="graduate_student_count" property="graduatestudentcount" javaType="java.lang.Integer"/>
+      <result column="current_count" property="currentcount" javaType="java.lang.Integer"/>
+    </resultMap>
+	
+	<resultMap type="com.bjxc.school.StudentSubject" id="StudentSubjectMap">
+		<result column="subject_id" property="subjectId"/>
+		<result column="subject_name" property="subjectName"/>
+		<result column="subject_student_count/student_count" property="count"/>
+	</resultMap>
+	
+
+    <select id="getList" resultMap="StudentCountMap"  statementType="CALLABLE">
+    	 {call stati_student(
+      		#{start_date,jdbcType=DATE,mode=IN},
+      		#{end_date,jdbcType=DATE,mode=IN},
+      		#{insId,jdbcType=INTEGER,mode=IN},
+      		#{stationId,jdbcType=INTEGER,mode=IN},
+      		#{startIndex,jdbcType=INTEGER,mode=IN},
+      		#{length,jdbcType=INTEGER,mode=IN}
+    	 )}
+    </select>
+    
+    <select id="studentSubjectCount"  statementType="CALLABLE">
+    	{call stati_student_subject(
+    		#{insId,jdbcType=INTEGER,mode=IN},
+      		#{stationId,jdbcType=INTEGER,mode=IN}
+    	 )}
+    </select>
+	
+	
+</mapper>

@@ -1,0 +1,314 @@
+@CHARSET "UTF-8";
+
+::selection {
+    color: #fff;
+    background-color: rgba(248, 161, 68, 0.8);
+}
+
+::-moz-selection {
+    color: #fff;
+    background-color: rgba(248, 161, 68, 0.8);
+}
+
+body {
+    font-family: \5fae\8f6f\96c5\9ed1, 'Open Sans', sans-serif;
+    font-size: 12px;
+    position: relative;
+    color: #000;
+    line-height: 1.5em;
+    -webkit-font-smoothing: antialiased;
+}
+ol,ul{
+	list-style:none;
+}
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td{margin:0;padding:0}
+
+/**
+embed{
+	display:none;
+}
+**/
+
+
+
+/*a, a:visited {
+    color: #41667c;
+    text-decoration: none;
+    -webkit-transition: background-color linear 0.1s, color linear 0.1s;
+    -moz-transition: background-color linear 0.1s, color linear 0.1s;
+    -ms-transition: background-color linear 0.1s, color linear 0.1s;
+    -o-transition: background-color linear 0.1s, color linear 0.1s;
+    transition: background-color linear 0.1s, color linear 0.1s;
+}*/
+
+h1, h2, h3 {
+    margin: 10px 0;
+}
+
+button, .btn {
+    border-radius: 3px !important;
+}
+
+a:hover {
+    color: #21465c;
+    text-decoration: underline;
+}
+
+a:active {
+    color: #092e44;
+    text-decoration: underline;
+}
+
+form input{
+	outline: none;
+	border: 1px solid #d5d5d5;
+	border-radius:2px;
+}
+
+.rk_error, .rk_warn, .rk_info, .rk_success {
+    padding: 4px 6px;
+}
+
+.rk_error {
+    background: #f2dede;
+    color: #a42625;
+}
+
+.rk_warn {
+    background: #ffefc6;
+    color: #960;
+}
+
+.rk_info {
+    background: #d9edf7;
+    color: #326aa8;
+}
+
+.rk_success {
+    background: #dff0d8;
+    color: #468847;
+}
+
+.rk_middle {
+    margin-bottom: 40px;
+}
+
+.rk_navbar_brand {
+    margin-left: 15px;
+}
+
+.rk_navbar_brand_logo {
+    margin-top: 8px;
+    height: 38px;
+    width: 38px;
+}
+
+.rk_navbar_brand_char {
+    margin-top: 6px;
+    margin-left: 8px;
+    height: 26px;
+    width: 55px;
+}
+
+#rk_backtop {
+    display: none;
+    position: fixed;
+    right: 30px;
+    bottom: 30px;
+    font-size: 40px;
+}
+
+.rk_editor_textarea{
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    -webkit-transition: border linear .2s, box-shadow linear .2s;
+    -moz-transition: border linear .2s, box-shadow linear .2s;
+    -o-transition: border linear .2s, box-shadow linear .2s;
+    transition: border linear .2s, box-shadow linear .2s;
+    padding: 4px 6px;
+    font-size: 14px;
+    line-height: 20px;
+    color: #555555;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    vertical-align: middle;
+    outline: none;
+    height: 100px;
+}
+/*上传组件样式 start*/
+.rk_swfupload{
+	min-height:40px;
+	min-widht:40px;
+	position:relative;
+}
+.rk_swfupload .preview{
+	position:absolute;left:0;top:0;
+}
+.rk_swfupload .swfobj{
+	position:absolute;left:0;top:0;
+}
+
+
+.uploadify {
+	position: relative;
+	margin-bottom: 1em;
+}
+
+.uploadify-button.disabled {
+	background-color: #D0D0D0;
+	color: #808080;
+}
+.uploadify-queue {
+	margin-bottom: 1em;
+	position:absolute;left:0;top:0;
+}
+.uploadify-queue .fileName{
+	min-width:80px;
+	width:100%;
+}
+.uploadify-queue-item {
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	font: 11px Verdana, Geneva, sans-serif;
+	margin-top: 5px;
+	max-width: 350px;
+	padding: 10px;
+}
+.uploadify-error {
+	background-color: #FDE5DD !important;
+}
+.uploadify-queue-item .cancel a {
+	background: url('uploadify-cancel.png') 0 0 no-repeat;
+	float: right;
+	height:	16px;
+	text-indent: -9999px;
+	width: 16px;
+}
+.uploadify-queue-item.completed {
+	background-color: #E5E5E5;
+}
+.uploadify-progress {
+	background-color: #E5E5E5;
+	margin-top: 10px;
+	width: 100%;
+}
+.uploadify-progress-bar {
+	background-color: #0099FF;
+	height: 3px;
+	width: 1px;
+}
+
+/*上传组件样式 end*/
+
+@media(min-width: 992px) {
+    .container {
+        padding: 0 50px;
+    }
+}
+
+.vertical_line{
+	height:11px;
+	border-left:1px solid #767676;
+	margin:4px 8px;
+	float:left;
+}
+
+.bottom_line{
+	border-bottom:1px solid #DDD;
+}
+
+/**
+*	操作图标
+*/
+.ispc_func_items{
+	float:right;
+}
+.ispc_func_item{
+	float:right;
+	margin-right:10px;
+	color:#888888;
+	line-height:16px;
+	cursor:pointer;
+}
+
+.ispc_func_item i{
+	float:left;
+	width:16px;
+	height:16px;
+	background-image:url(img/post_icons.png);
+	background-repeat:no-repeat;
+}
+.ispc_func_item.reply i{
+	margin-right:2px;
+	background-position:0 -191px;
+}
+.ispc_func_item.transfer i{
+	background-position:0 -176px;
+}
+.ispc_func_item.callback i{
+	background-position:0 -224px;
+}
+.ispc_func_item.finish i{
+	background-position:0 -144px;
+}
+.ispc_func_item.delete i{
+	background-position:0 -160px;
+}
+.ispc_func_item.edit i{
+	background-position:0 -208px;
+}
+.ispc_func_item.close i{
+	background-position:0 -256px;
+}
+.ispc_func_item.print i{
+	background-position:0 -288px;
+}
+.ispc_func_item.detail i{
+	background-position:0 -272px;
+}
+.ispc_func_item.vote i{
+	background-position:0 -354px;
+}
+.ispc_func_item.survey i{
+	background-position:0 -370px;
+}
+.ispc_func_item.result i{
+	background-position:0 -386px;
+}
+.ispc_func_item.audit i{
+	background-position:0 -403px;
+}
+.ispc_func_item.evalute i{
+	background-position:0 -421px;
+}
+.ispc_func_item.urge i{
+	background-position:0 -492px;
+}
+
+.ispc_func_item.top i{
+    background-position:0 -508px;
+}
+
+.qrcode_content{
+	max-height: 100px;
+	max-width: 100px;
+	min-height: 100px;
+	min-width: 100px;
+}
+
+.rk_func_item{
+	cursor:pointer; 
+	float: right;
+	margin-right:10px;
+	width:14px;
+	height:14px;
+	font-size:14px;
+}
+
+
+.phoneEditor{height:600px}

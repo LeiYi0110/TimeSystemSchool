@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.EachoutlineMapper">
+	
+	<select id="pageList" resultType="com.bjxc.school.Eachoutline">
+		select id,cartype,subjectId,courseNum from teachoutline
+		<where>
+			<if test="cartype != null">
+				cartype=#{cartype}
+			</if>
+		</where>
+		limit ${start},${size}
+	</select>
+	<select id="total" resultType="Integer">
+		select count(*) from teachoutline
+		<where>
+			<if test="cartype != null">
+			cartype=#{cartype}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 添加数据 -->
+	<insert id="add" parameterType="com.bjxc.school.Eachoutline">
+		insert into
+		texaminer(
+		inscode,name,sex,idcard,mobile,address,photo, 
+		fingerprint,drilicence,fstdrilicdate,dripermitted,teachpermitted,employstatus,hiredate,leavedate,occupationno,occupationlevel,photourl
+		)
+		value(#{inscode},#{name},#{sex},#{idcard},#{mobile},#{address},#{photo}
+		,#{fingerprint},#{drilicence},#{fstdrilicdate},#{dripermitted},#{teachpermitted},#{employstatus},#{hiredate}
+		,#{leavedate},#{occupationno},#{occupationlevel},#{photourl})
+	</insert>
+	<!-- 处理投诉信息 -->
+	<update id="update" parameterType="com.bjxc.school.Eachoutline">
+		update teachoutline
+		<set>
+			<if test="courseNum != null">
+                courseNum = #{courseNum},
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+</mapper>

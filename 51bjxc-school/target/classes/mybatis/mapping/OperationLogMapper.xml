@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.OperationLogMapper">
+
+
+<select id="list" resultType="com.bjxc.school.OperationLog">
+		SELECT * FROM toperationlog  
+		<where>
+			<if test="searchText != null">
+				(logEvent like CONCAT(CONCAT('%',#{searchText}), '%')
+				or logUser like CONCAT(CONCAT('%',#{searchText}), '%')
+				or logTime=#{searchText})
+			</if>
+			and insId = #{insId} order by id desc			
+		</where>
+	</select>
+</mapper>

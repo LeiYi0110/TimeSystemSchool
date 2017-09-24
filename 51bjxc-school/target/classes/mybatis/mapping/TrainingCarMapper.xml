@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.TrainingCarMapper">
+
+	<select id="getList" resultType="com.bjxc.school.TrainingCar">
+		select
+		id,inscode,carnum,licnum,brand,platecolor,perdritype,Address,franum,manufacture,areanme,buydate,engnum,photo,remarks,insId,isProvince
+		from(select
+		t.id,t.inscode,t.carnum,t.licnum,t.brand,t.platecolor,t.perdritype,s.Address,t.franum,t.manufacture,h.name
+		as areanme,t.buydate,t.engnum,t.photo,t.remarks,t.insId,t.isProvince
+		from trainingcar t
+		LEFT JOIN tcoach c on t.coachId=c.ID
+		LEFT
+		JOIN tcoachservice a on a.CoachId=c.ID
+		LEFT JOIN TServiceStation s on
+		a.StationId=s.ID
+		LEFT JOIN tteacharea h on h.id=s.areaId
+		) views where  insId=#{insId}
+		<if test="searchText != null">
+			and (licnum like CONCAT(CONCAT('%',#{searchText}), '%')
+			or
+			brand like CONCAT(CONCAT('%',#{searchText}), '%')
+		
+			or
+			perdritype like CONCAT(CONCAT('%',#{searchText}),'%'))	
+		</if>
+		order by id desc limit ${start},${size}
+		
+	</select>
+	
+	<select id="total" resultType="Integer">
+	
+		select
+		count(*)
+		from(select
+		t.id,t.inscode,t.carnum,t.licnum,t.brand,t.platecolor,t.perdritype,s.Address,t.franum,t.manufacture,h.name
+		as areanme,t.buydate,t.engnum,t.insId
+		from trainingcar t
+		LEFT JOIN tcoach c on t.coachId=c.ID
+		LEFT
+		JOIN tcoachservice a on a.CoachId=c.ID
+		LEFT JOIN TServiceStation s on
+		a.StationId=s.ID
+		LEFT JOIN tteacharea h on h.id=s.areaId
+		) views where  insId=#{insId}
+		<if test="searchText != null">
+	        and (licnum like CONCAT(CONCAT('%',#{searchText}), '%')
+			or
+			brand like CONCAT(CONCAT('%',#{searchText}), '%')
+		
+			or
+			perdritype like CONCAT(CONCAT('%',#{searchText}),'%'))	
+		</if>
+	</select>
+
+	<update id="update">
+		update TrainingCar
+		<set>
+			<if test="inscode!=null">
+				inscode=#{inscode},
+			</if>
+			<if test="franum !=null">
+				franum=#{franum},
+			</if>
+			<if test="engnum !=null">
+				engnum=#{engnum},
+			</if>
+			<if test="licnum !=null">
+				licnum=#{licnum},
+			</if>
+			<if test="platecolor !=null">
+				platecolor=#{platecolor},
+			</if>
+			<if test="manufacture !=null">
+				manufacture=#{manufacture},
+			</if>
+			<if test="brand !=null">
+				brand=#{brand},
+			</if>
+			<if test="model !=null">
+				model=#{model},
+			</if>
+			<if test="perdritype !=null">
+				perdritype=#{perdritype},
+			</if>
+			<if test="buydate !=null">
+				buydate=#{buydate},
+			</if>
+			<if test="photourl !=null">
+				photourl=#{photourl},
+			</if>
+				<if test="photo !=null">
+				photo=#{photo},
+			</if>
+		    <if test="remarks !=null">
+				remarks=#{remarks},
+			</if>
+			 <if test="isProvince !=null">
+				isProvince=#{isProvince}
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+
+	<insert id="adds" parameterType="com.bjxc.school.TrainingCar">
+	insert into TrainingCar(inscode,franum,engnum,licnum,platecolor,manufacture,brand,model,perdritype,buydate,carnum,photourl,photo,remarks,insId,isCountry,isProvince) 
+	values(#{inscode},#{franum},#{engnum},#{licnum},#{platecolor},#{manufacture},#{brand},#{model},#{perdritype},#{buydate},#{carnum},#{photourl},#{photo},#{remarks},#{insId},1,0)
+	</insert>
+
+	<select id="carlist" resultType="com.bjxc.school.TrainingCar">
+		select
+		t.carnum,t.licnum,t.brand,t.platecolor,c.Teachpermitted,s.Address,t.franum,t.manufacture
+		from trainingcar t LEFT JOIN tcoach c on t.coachId=c.ID
+		LEFT JOIN
+		tcoachservice a on a.CoachId=c.ID
+		LEFT JOIN TServiceStation s on
+		a.StationId=s.ID
+	</select>
+	
+	<delete id="deletes" parameterType="com.bjxc.school.TrainingCar">
+	  delete from trainingcar where id=#{id}
+	</delete>
+</mapper>

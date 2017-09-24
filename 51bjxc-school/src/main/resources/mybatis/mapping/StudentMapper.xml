@@ -1,0 +1,809 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.StudentMapper">
+
+
+	<!--练车场地信息搜索栏 -->
+	<select id="pageList" resultType="com.bjxc.school.Student">
+		select * from (
+		
+		SELECT st.*,ct.classcurr classTypeName,co.id coachId,co.Name
+		coachName,ss.name stationName,
+		sub.subjectId,ct.paymode as paymode,1 as
+		orderNo,ct.chargemode
+		FROM
+		tStudent st
+		left join TClassType ct on st.ClassTypeId =
+		ct.id
+		inner join (select * from (select * from TStudentSubject order by
+		StudentId,CreateTime desc)t
+	    group by
+		t.StudentId having max(t.CreateTime) )
+		sub on st.id = sub.StudentId
+		left
+		join TCoach co on sub.coachId = co.id
+		left join TServiceStation ss on
+		st.StationId = ss.id
+		where sub.CoachId is NULL and SubjectId in (2,3)
+		
+		UNION
+		
+		
+		SELECT
+		st.*,ct.classcurr classTypeName,co.id coachId,co.Name
+		coachName,ss.name
+		stationName,
+		sub.subjectId,ct.paymode as paymode,2 as
+		orderNo,ct.chargemode
+		FROM tStudent st
+		left join TClassType ct on st.ClassTypeId =
+		ct.id
+		inner join (select * from (select * from TStudentSubject order by
+		StudentId,CreateTime desc)t group by t.StudentId having
+		max(t.CreateTime) ) sub on st.id = sub.StudentId
+		left join TCoach co on
+		sub.coachId = co.id
+		left join TServiceStation ss on
+		st.StationId = ss.id
+		where not (sub.CoachId is NULL and SubjectId in (2,3))
+
+		
+		) as A
+		<where>
+			<if test="stationId != null">
+				and A.StationId = #{stationId}
+			</if>
+			<if test="stationId == null">
+				and (A.StationId =0 or A.StationId!=0)  
+			</if>
+			<if test="searchText != null and searchText !=''">
+				and (A.name like CONCAT(CONCAT('%',#{searchText}), '%')
+				or A.Mobile like CONCAT(CONCAT('%',#{searchText}), '%')
+				or A.Idcard
+				like CONCAT(CONCAT('%',#{searchText}), '%')
+				or A.fileNum = #{searchText}
+				)
+			</if>
+			<if test="time1 != null">
+				and Applydate &gt;= #{time1}
+			</if>
+			<if test="time2 != null">
+				and Applydate &lt;= #{time2}
+			</if>
+			<if test="subjectid != null">
+				and subjectid = #{subjectid}
+			</if>
+			<if test="traintype != null and traintype!=''">
+				and traintype = #{traintype}
+			</if>
+			<if test="sex!=null">
+				and A.sex=#{sex}
+			</if>
+			<if test="stationName!=null and stationName!=''">
+				and A.stationName like CONCAT(CONCAT('%',#{stationName}), '%')
+			</if>
+			<if test="paymode!=null">
+				and A.paymode=#{paymode}
+			</if>
+			<if	test="chargemode!=null">
+				and A.chargemode=#{chargemode}
+			</if>
+			and A.InsId = #{insId}
+		</where>
+		order by id desc
+		limit ${start},${size}
+	</select>
+
+	<select id="get" resultType="com.bjxc.school.Student">
+		select * from (
+		
+		SELECT st.*,ct.classcurr classTypeName,co.id coachId,co.Name
+		coachName,ss.name stationName,
+		sub.subjectId,ct.paymode as paymode,1 as
+		orderNo
+		FROM
+		tStudent st
+		left join TClassType ct on st.ClassTypeId =
+		ct.id
+		inner join (select * from (select * from TStudentSubject order by
+		StudentId,CreateTime desc)t
+	    group by
+		t.StudentId having max(t.CreateTime) )
+		sub on st.id = sub.StudentId
+		left
+		join TCoach co on sub.coachId = co.id
+		left join TServiceStation ss on
+		st.StationId = ss.id
+		where sub.CoachId is NULL and SubjectId in (2,3)
+		
+		UNION
+		
+		
+		SELECT
+		st.*,ct.classcurr classTypeName,co.id coachId,co.Name
+		coachName,ss.name
+		stationName,
+		sub.subjectId,ct.paymode as paymode,2 as
+		orderNo
+		FROM tStudent st
+		left join TClassType ct on st.ClassTypeId =
+		ct.id
+		inner join (select * from (select * from TStudentSubject order by
+		StudentId,CreateTime desc)t group by t.StudentId having
+		max(t.CreateTime) ) sub on st.id = sub.StudentId
+		left join TCoach co on
+		sub.coachId = co.id
+		left join TServiceStation ss on
+		st.StationId = ss.id
+		where not (sub.CoachId is NULL and SubjectId in (2,3))
+
+		
+		) as A
+		
+		<if test="id != null">
+			where id=#{id}
+		</if>
+	</select>
+
+	<select id="getCoachStu" resultType="com.bjxc.school.Student">
+		SELECT st.*,ct.classcurr classTypeName,co.id coachId,co.Name
+		coachName,ss.name stationName,
+		sub.subjectId,ct.paymode as paymode
+		FROM
+		tStudent st
+		left join TClassType ct on st.ClassTypeId = ct.id
+		left join
+		(select * from (select * from TStudentSubject order by
+		StudentId,subjectId desc)t group by t.StudentId having
+		max(t.subjectId) ) sub on st.id = sub.StudentId
+		left join TCoach co on
+		sub.coachId = co.id
+		left join TServiceStation ss on
+		st.StationId = ss.id
+		<where>
+			<if test="coachId != null">
+				co.id=#{coachId}
+			</if>
+			<if test="searchText != null">
+				and (co.name like CONCAT(CONCAT('%',#{searchText}), '%'))
+			</if>
+		</where>
+		limit ${start},${size}
+	</select>
+
+	<select id="totalCoachStu" resultType="Integer">
+		SELECT count(1)
+		FROM tStudent st
+		left join (select * from (select * from
+		TStudentSubject order by
+		StudentId,subjectId desc)t group by
+		t.StudentId having
+		max(t.subjectId) ) sub on st.id = sub.StudentId
+		left
+		join TCoach co on sub.coachId = co.id
+		<where>
+			<if test="coachId != null">
+				co.id=#{coachId}
+			</if>
+			<if test="searchText != null">
+				and (co.name like CONCAT(CONCAT('%',#{searchText}), '%'))
+			</if>
+		</where>
+	</select>
+
+	<select id="total" resultType="Integer">
+		select count(*) from (
+		SELECT st.*,ct.classcurr classTypeName,co.id coachId,co.Name
+		coachName,ss.name stationName,
+		sub.subjectId,ct.paymode as paymode,1 as
+		orderNo,ct.chargemode
+		FROM
+		tStudent st
+		left join TClassType ct on st.ClassTypeId =
+		ct.id
+		inner join (select * from (select * from TStudentSubject order by
+		StudentId,CreateTime desc)t
+	    group by
+		t.StudentId having max(t.CreateTime) )
+		sub on st.id = sub.StudentId
+		left
+		join TCoach co on sub.coachId = co.id
+		left join TServiceStation ss on
+		st.StationId = ss.id
+		where sub.CoachId is NULL and SubjectId in (2,3)
+		
+		UNION
+		
+		
+		SELECT
+		st.*,ct.classcurr classTypeName,co.id coachId,co.Name
+		coachName,ss.name
+		stationName,
+		sub.subjectId,ct.paymode as paymode,2 as
+		orderNo,ct.chargemode
+		FROM tStudent st
+		left join TClassType ct on st.ClassTypeId =
+		ct.id
+		inner join (select * from (select * from TStudentSubject order by
+		StudentId,CreateTime desc)t group by t.StudentId having
+		max(t.CreateTime) ) sub on st.id = sub.StudentId
+		left join TCoach co on
+		sub.coachId = co.id
+		left join TServiceStation ss on
+		st.StationId = ss.id
+		where not (sub.CoachId is NULL and SubjectId in (2,3))
+		) as A
+		<where>
+			<if test="stationId != null">
+				and A.StationId = #{stationId}
+			</if>
+			<if test="searchText != null and searchText!=''">
+				and (A.name like CONCAT(CONCAT('%',#{searchText}), '%')
+				or A.Mobile like CONCAT(CONCAT('%',#{searchText}), '%')
+				or A.Idcard
+				like CONCAT(CONCAT('%',#{searchText}), '%')
+				or a.fileNum = #{searchText}
+				)
+			</if>
+			<if test="time1 != null">
+				and Applydate &gt;= #{time1}
+			</if>
+			<if test="time2 != null">
+				and Applydate &lt;= #{time2}
+			</if>
+			<if test="subjectid != null">
+				and subjectid = #{subjectid}
+			</if>
+			<if test="traintype != null and traintype != ''">
+				and traintype = #{traintype}
+			</if>
+			<if test="sex!=null">
+				and sex=#{sex}
+			</if>
+			<if test="stationName!=null and stationName!='' ">
+				and A.stationName like CONCAT(CONCAT('%',#{stationName}), '%')
+			</if>
+			<if test="paymode!=null">
+				and A.paymode=#{paymode}
+			</if>
+			<if	test="chargemode!=null">
+				and A.chargemode=#{chargemode}
+			</if>
+			and A.InsId = #{insId}
+		</where>
+	</select>
+
+	<!--学员信息报错 -->
+	<select id="pageBaocuoList" resultType="com.bjxc.school.Student">
+		SELECT st.*,ct.classcurr classTypeName,co.id coachId,co.Name
+		coachName,ss.name stationName,
+		sub.subjectId,ct.paymode as paymode
+		FROM
+		tStudent st
+		left join TClassType ct on st.ClassTypeId = ct.id
+		left join
+		(select * from (select * from TStudentSubject order by
+		StudentId,subjectId desc)t group by t.StudentId having
+		max(t.subjectId) ) sub on st.id = sub.StudentId
+		left join TCoach co on
+		sub.coachId = co.id
+		left join TServiceStation ss on
+		st.StationId = ss.id
+		<where>
+			<if test="stationId != null">
+				and st.StationId = #{stationId}
+			</if>
+			<if test="searchText != null">
+				and (st.name like CONCAT(CONCAT('%',#{searchText}), '%')
+				or st.Mobile like CONCAT(CONCAT('%',#{searchText}), '%')
+				or st.Idcard
+				like CONCAT(CONCAT('%',#{searchText}), '%')
+				)
+			</if>
+			and st.InsId = #{insId} and st.isWrong=1
+		</where>
+		limit ${start},${size}
+	</select>
+
+	<select id="totalBaocuo" resultType="Integer">
+		SELECT count(*) from tStudent
+		<where>
+			<if test="stationId != null">
+				and StationId = #{stationId}
+			</if>
+			<if test="searchText != null">
+				and (name like CONCAT(CONCAT('%',#{searchText}), '%')
+				or
+				Mobile like CONCAT(CONCAT('%',#{searchText}), '%')
+				or Idcard like
+				CONCAT(CONCAT('%',#{searchText}), '%')
+				)
+			</if>
+			and InsId = #{insId} and isWrong=1
+		</where>
+	</select>
+
+	<!-- 添加数据 -->
+	<insert id="add" parameterType="com.bjxc.school.Student"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		tStudent(
+		userId,insId,name,mobile,cradtype,idcard,nationality,
+		sex,address,photo,fingerprint,busitype,drilicnum,fstdrilicdate,
+		perdritype,traintype,applydate,status,stunum,classTypeId,stationId,tuition,alreadyPay,arrearage,createTime,refereeMobile,remark,paymentType,isCountry,isProvince
+		)
+		value(#{userId},#{insId},#{name},#{mobile},#{cradtype},#{idcard},#{nationality}
+		,#{sex},#{address},#{photo},#{fingerprint},#{busitype},#{drilicnum},#{fstdrilicdate}
+		,#{perdritype},#{traintype},#{applydate},#{status},#{stunum},#{classTypeId},#{stationId},#{tuition},#{alreadyPay},#{arrearage},now(),#{refereeMobile},#{remark},#{paymentType},1,0)
+		<selectKey keyProperty="id" resultType="Integer">
+			select
+			last_insert_id() as id
+		</selectKey>
+	</insert>
+
+	<insert id="addByExcel" parameterType="com.bjxc.school.Student"
+	useGeneratedKeys="true" keyProperty="id">
+		insert into
+		tStudent(
+		userId,insId,name,mobile,cradtype,idcard,nationality,
+		sex,address,photo,fingerprint,busitype,drilicnum,fstdrilicdate,
+		perdritype,traintype,applydate,stunum,classTypeId,stationId,tuition,alreadyPay,arrearage,createTime,refereeMobile,isCountry
+		)
+		value(#{userId},#{insId},#{name},#{mobile},#{cradtype},#{idcard},#{nationality}
+		,#{sex},#{address},#{photo},#{fingerprint},#{busitype},#{drilicnum},#{fstdrilicdate}
+		,#{perdritype},#{traintype},#{applydate},#{stunum},#{classTypeId},#{stationId},#{tuition},#{alreadyPay},#{arrearage},now(),#{refereeMobile},1)
+	</insert>
+
+	<!-- 可执教的学员名字、id -->
+	<select id="stuCoachDuty" resultType="java.util.HashMap">
+		select s.id as result,s.name as title ,s.mobile as mobile
+		from TStudent s 
+			left join TStudentSubject t on t.studentid=s.id
+
+		where t.coachId = #{coachId}
+		<if test="subjectId==0">
+			and t.SubjectId in (2,3)
+		</if>
+		<if test="subjectId==2">
+			and t.SubjectId=2
+		</if>
+		<if test="subjectId==3">
+			and t.SubjectId=3
+		</if>
+		and t.status = 1 
+		and s.name like CONCAT(CONCAT('%',#{name}), '%')
+	</select>
+
+	<!-- 修改练车场地信息 -->
+	<update id="update" parameterType="com.bjxc.school.Student">
+		update tStudent
+		<set>
+			<if test="userId != null">
+				userId = #{userId},
+			</if>
+			<if test="insId != null">
+				insId = #{insId},
+			</if>
+			<if test="name != null">
+				name = #{name},
+			</if>
+			<if test="mobile != null">
+				mobile = #{mobile},
+			</if>
+			<if test="cradtype != null">
+				cradtype = #{cradtype},
+			</if>
+			<if test="idcard != null">
+				idcard = #{idcard},
+			</if>
+			<if test="nationality != null">
+				nationality = #{nationality},
+			</if>
+			<if test="sex != null">
+				sex = #{sex},
+			</if>
+			<if test="address != null">
+				address = #{address},
+			</if>
+			<if test="photo != null">
+				photo = #{photo},
+			</if>
+			<if test="fingerprint != null">
+				fingerprint = #{fingerprint},
+			</if>
+			<if test="busitype != null">
+				busitype = #{busitype},
+			</if>
+			<if test="drilicnum != null">
+				drilicnum = #{drilicnum},
+			</if>
+			<if test="fstdrilicdate != null">
+				fstdrilicdate = #{fstdrilicdate},
+			</if>
+			<if test="perdritype != null">
+				perdritype = #{perdritype},
+			</if>
+			<if test="traintype != null">
+				traintype = #{traintype},
+			</if>
+			<if test="applydate != null">
+				applydate = #{applydate},
+			</if>
+			<if test="status != null">
+				status = #{status},
+			</if>
+			<if test="stunum != null">
+				stunum = #{stunum},
+			</if>
+			<if test="stationId != null">
+				stationId = #{stationId},
+			</if>
+			<if test="classTypeId != null">
+				classTypeId = #{classTypeId},
+			</if>
+			<if test="tuition != null">
+				tuition = #{tuition},
+			</if>
+			<if test="alreadyPay != null">
+				alreadyPay = #{alreadyPay},
+			</if>
+			<if test="arrearage != null">
+				arrearage = #{arrearage},
+			</if>
+			<if test="refereeMobile != null">
+				refereeMobile = #{refereeMobile},
+			</if>
+			<if test="remark != null">
+				remark = #{remark},
+			</if>
+			<if test="paymentType != null">
+				paymentType=#{paymentType},
+			</if>
+		
+		</set>
+		where id=#{id}
+	</update>
+	<!--学员过期 -->
+	<select id="pageExpireList" resultType="com.bjxc.school.Student">
+		SELECT st.*,ct.classcurr classTypeName,co.id coachId,co.Name as
+		coachName,ss.name as stationName,
+		sub.subjectId,ct.paymode as paymode,sub.CreateTime as subjectTime,
+		datediff( now(),sub.CreateTime) as overdueTime
+		FROM
+		tStudent st
+		left join TClassType ct on st.ClassTypeId = ct.id
+		left join
+		(select * from (select * from TStudentSubject order by
+		StudentId,subjectId desc)t group by t.StudentId having
+		max(t.subjectId) ) sub on st.id = sub.StudentId
+		left join TCoach co on
+		sub.coachId = co.id
+		left join TServiceStation ss on
+		st.StationId = ss.id
+		<where>
+
+			
+			<if test="searchText != null">
+				and (st.name like CONCAT(CONCAT('%',#{searchText}), '%')
+				or st.Mobile like CONCAT(CONCAT('%',#{searchText}), '%')
+				or st.Idcard
+				like CONCAT(CONCAT('%',#{searchText}), '%')
+				)
+			</if>
+			and st.InsId = #{insId} and st.CreateTime&lt;date_sub(now(),INTERVAL
+			3 year) order by datediff( now(),sub.CreateTime)
+		</where>
+		limit ${start},${size}
+	</select>
+
+	<select id="totalExpire" resultType="Integer">
+		SELECT count(*) from tStudent
+		<where>
+			
+			<if test="searchText != null">
+				and (name like CONCAT(CONCAT('%',#{searchText}), '%')
+				or
+				Mobile like CONCAT(CONCAT('%',#{searchText}), '%')
+				
+				or Idcard like
+				CONCAT(CONCAT('%',#{searchText}), '%')
+				)
+			</if>
+			and InsId = #{insId} and CreateTime&lt;date_sub(now(),INTERVAL
+			3 year)
+		</where>
+	</select>
+
+	<!--学时预警 -->
+	<select id="pageWarningList" resultType="com.bjxc.school.Student">
+		select A.StudentId as
+		id,B.Name,B.sex,B.Mobile,B.classTypeName,B.paymode as
+		paymode,B.Applydate,B.Traintype,B.Idcard,B.Cradtype,week,A.weekcount
+		as Reservation,B.weekcount as Classhour,A.name as coachName,A.day
+		from
+		(select StudentId,
+		YEARWEEK(TStudentReserveInfo.day,1) as week,count(*) as
+		weekcount,TCoach.Name,TStudentReserveInfo.day
+		from
+		tstudentreserve
+		INNER JOIN tstudentreserveinfo on tstudentreserve.ID =
+		tstudentreserveinfo.ReserveId
+		left join TCoach on TCoach.id=TStudentReserve.CoachId
+		where tstudentreserveinfo.`Status` in
+		(1,2)
+		group by StudentId, YEARWEEK(TStudentReserveInfo.day,1)) as A,
+
+		(select st.ID as id,st.Name as name,st.Sex as sex,st.Mobile as
+		Mobile,st.Applydate as Applydate,st.Traintype as Traintype,st.Idcard
+		as Idcard,st.Cradtype as Cradtype,ct.classcurr as
+		classTypeName,ct.paymode,ct.ResRegular as weekcount from TStudent st
+		inner join TClassType ct on st.ClassTypeId = ct.ID
+		<if test="searchText != null">
+			and (st.name like CONCAT(CONCAT('%',#{searchText}), '%')
+			or st.Mobile like CONCAT(CONCAT('%',#{searchText}), '%')
+			or st.Idcard
+			like CONCAT(CONCAT('%',#{searchText}), '%'))
+		</if>
+		) as B
+		where A.StudentId = B.id and A.weekcount > B.weekcount and A.week=YEARWEEK(now())
+		limit
+		${start},${size}
+	</select>
+
+	<select id="totalWarning" resultType="Integer">
+		select count(*)
+		from
+		(select StudentId,
+		YEARWEEK(TStudentReserveInfo.day,1) as week,count(*) as
+		weekcount
+		from
+		tstudentreserve
+		INNER JOIN tstudentreserveinfo on tstudentreserve.ID =
+		tstudentreserveinfo.ReserveId
+		where tstudentreserveinfo.`Status` in
+		(1,2)
+		group by StudentId, YEARWEEK(TStudentReserveInfo.day,1)) as A,
+
+		(select TStudent.ID as StudentId,TStudent.Name as name,TStudent.Sex as
+		sex,Tstudent.Mobile as Mobile, TClassType.ResRegular as weekcount from
+		TStudent inner join TClassType on TStudent.ClassTypeId = TClassType.ID
+		<if test="searchText != null">
+			and (TStudent.name like CONCAT(CONCAT('%',#{searchText}),
+			'%')
+			or TStudent.Mobile like CONCAT(CONCAT('%',#{searchText}), '%')
+			or
+			TStudent.Idcard like CONCAT(CONCAT('%',#{searchText}), '%'))
+		</if>
+		) as B
+		where A.StudentId = B.StudentId and A.weekcount > B.weekcount and A.week=YEARWEEK(now())
+	</select>
+
+	<update id="updateUser" parameterType="com.bjxc.school.Student">
+		update TUser
+		<set>
+			<if test="photo != null">
+				Headimg=#{photo},
+			</if>
+			<if test="idcard!=null and idcard!=''">
+				Idcard=#{idcard},
+			</if>
+			<if test="sex!=null">
+				Sex=#{sex},
+			</if>
+			<if test="name!=null and name!=''">
+				UserName=#{name}
+			</if>
+		</set>
+		where id=#{userId};
+	</update>
+
+	<!-- 导出所有学员信息 -->
+	<select id="studentList" resultType="com.bjxc.school.Student">
+		select * from (
+		
+		SELECT st.*,ct.classcurr classTypeName,co.id coachId,co.Name
+		coachName,ss.name stationName,
+		sub.subjectId,ct.paymode as paymode,1 as
+		orderNo
+		FROM
+		tStudent st
+		left join TClassType ct on st.ClassTypeId =
+		ct.id
+		inner join (select * from (select * from TStudentSubject order by
+		StudentId,CreateTime desc)t
+	    group by
+		t.StudentId having max(t.CreateTime) )
+		sub on st.id = sub.StudentId
+		left
+		join TCoach co on sub.coachId = co.id
+		left join TServiceStation ss on
+		st.StationId = ss.id
+		where sub.CoachId is NULL and SubjectId in (2,3)
+		
+		UNION
+		
+		
+		SELECT
+		st.*,ct.classcurr classTypeName,co.id coachId,co.Name
+		coachName,ss.name
+		stationName,
+		sub.subjectId,ct.paymode as paymode,2 as
+		orderNo
+		FROM tStudent st
+		left join TClassType ct on st.ClassTypeId =
+		ct.id
+		inner join (select * from (select * from TStudentSubject order by
+		StudentId,CreateTime desc)t group by t.StudentId having
+		max(t.CreateTime) ) sub on st.id = sub.StudentId
+		left join TCoach co on
+		sub.coachId = co.id
+		left join TServiceStation ss on
+		st.StationId = ss.id
+		where not (sub.CoachId is NULL and SubjectId in (2,3))
+
+		
+		) as A
+		<where>
+			<if test="stationId != null">
+					and A.StationId = #{stationId}
+			</if>
+			and A.InsId = #{insId}
+		</where>	
+	</select>
+	<!-- 根据教练查询所有学员 -->
+	<select id="getCoachStudent" resultType="com.bjxc.school.Student">
+		SELECT st.*,ct.classcurr classTypeName,co.id coachId,co.Name
+		coachName,ss.name stationName,
+		sub.subjectId,ct.paymode as paymode
+		FROM
+		tStudent st
+		left join TClassType ct on st.ClassTypeId = ct.id
+		left join
+		(select * from (select * from TStudentSubject order by
+		StudentId,subjectId desc)t group by t.StudentId having
+		max(t.subjectId) ) sub on st.id = sub.StudentId
+		left join TCoach co on
+		sub.coachId = co.id
+		left join TServiceStation ss on
+		st.StationId = ss.id
+		<where>
+			<if test="coachId != null">
+				co.id=#{coachId}
+			</if>
+			<if test="searchText != null">
+				and (co.name like CONCAT(CONCAT('%',#{searchText}), '%'))
+			</if>
+		</where>
+	</select>
+	<!-- 查询学员账务账号信息 -->
+	<select id="getAccountList" parameterType="Integer"
+		resultType="com.bjxc.school.Student">
+		select
+		tstu.ID,tstu.stunum,tstu.Name,tstu.Traintype,tstu.AlreadyPay,tstu.Arrearage,
+		tstu.applydate,tstu.tuition,tstu.paymentType,tre.status
+		refundStatus,clas.classcurr
+		classTypeName,sub.Name subjectName
+		from
+		tstudent tstu left join trefund tre on tstu.ID=tre.studentID
+		left join
+		TClasstype clas on tstu.ClassTypeId =clas.ID
+		left join tstudentsubject
+		stuSubId on tstu.ID=stuSubId.StudentId
+		left join tsubject sub on
+		stuSubId.SubjectId=sub.ID
+		where (tstu.AlreadyPay > 100 or
+		tre.money>100) and tstu.stationId=#{stationId}
+		limit ${start},${size}
+	</select>
+
+	<!-- 查询学员账务总数 -->
+	<select id="totalAccount" parameterType="Integer" resultType="Integer">
+		select
+		COUNT(tstu.ID)
+		from
+		tstudent tstu left join trefund tre on
+		tstu.ID=tre.studentID
+		where
+		(tstu.AlreadyPay > 100 or tre.money>100) and
+		tstu.stationId=#{stationId}
+		<if test="stuId!=null">
+			and tstu.id=#{stuId}
+		</if>
+	</select>
+
+	<select id="getPayWaterList" resultType="com.bjxc.school.Student">
+		select
+		tstu.Applydate,tstu.Name,tstu.Traintype,tstu.AlreadyPay,tstu.Arrearage,tstu.ID
+		,tstu.tuition,clas.classcurr classTypeName,tstu.paymentType
+		from
+		tstudent tstu left join trefund tre on tstu.ID=tre.studentID
+		left join
+		TClasstype clas on tstu.ClassTypeId =clas.ID
+		left join tstudentsubject
+		stuSubId on tstu.ID=stuSubId.StudentId
+		left join tsubject sub on
+		stuSubId.SubjectId=sub.ID
+		where (tstu.AlreadyPay > 100 or
+		tre.money>100) and
+		tstu.stationId=#{stationId}
+		<if test="stuId != null">
+			and tstu.id=#{stuId}
+		</if>
+		group by
+		tstu.ID,tstu.Applydate
+		order by tstu.ID ,tstu.Applydate
+		<if test="start!=null">
+			<if test="size!=null">
+				limit ${start},${size}
+			</if>
+		</if>
+	</select>
+
+	<select id="checkStuRefund" resultType="Integer">
+		select tre.status from
+		TStudent tstu left join trefund tre on tstu.id=tre.studentID
+		where
+		tstu.id=#{id};
+	</select>
+	
+	<update id="updateStatus" >
+		update tStudent
+		<set>
+			<if test="status != null">
+				status = #{status},
+			</if>
+			<if test="organno != null">
+				organno=#{organno},
+			</if>
+			<if test="certificateno != null">
+				certificateno=#{certificateno},
+			</if>
+			<if test="documenturl != null">
+				documenturl=#{documenturl},
+			</if>
+			<if test="signatureurl != null">
+				signatureurl=#{signatureurl},
+			</if>
+		</set>
+		where id=#{studentId}
+	</update>
+	
+	
+	<update id="updateisProvince" parameterType="com.bjxc.school.Student">
+	 	update tStudent
+	 	<set>
+			<if test="isProvince != null">
+				isProvince = #{isProvince}
+			</if>
+		</set>
+				where id=#{id}
+	</update>
+	
+	<select id="idcarname"  resultType="com.bjxc.school.Student" parameterType="java.lang.String" >
+	   select id from  tStudent  where  idcard=#{idcard}
+	</select>
+	
+	<select id="getCoachStudents" resultType="com.bjxc.school.Student">
+		select a.name ,a.mobile, a.traintype
+			,d.classcurr as 'classTypeName'
+			,e.name as 'subjectName',a.idcard,a.recordnum 
+		from tstudent a
+			left join tstudentsubject b on a.id = b.studentid and b.status = 1
+			left join tcoach c on c.id = b.coachid
+			left join tclasstype d on d.id = a.classtypeid
+			left join tsubject e on e.id = b.subjectid
+		where c.id=#{coachId}
+		;
+	</select>
+	
+	<select id="getById" resultType="com.bjxc.school.Student">
+		select * from tstudent where id=#{id}
+	</select>
+	
+	
+	<select id="getByStuNum" resultType="com.bjxc.school.Student">
+		select * from tstudent
+		where stunum=#{stuNum} and name=#{stuName}
+		limit 1;
+	</select>
+</mapper>

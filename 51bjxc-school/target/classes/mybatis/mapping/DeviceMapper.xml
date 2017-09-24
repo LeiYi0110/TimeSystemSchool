@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjxc.school.mapper.DeviceMapper">
+	
+	<select id="getList" resultType="com.bjxc.school.Device">
+			SELECT d.*,t.licnum,de.sim,t.carnum,de.id as signid
+			FROM tdevice d 
+			left join tdevassign de on d.id=de.deviceId
+			left join trainingcar t on de.trainingcarId=t.id 
+			left join TimingTerminalType tim on d.termtype=tim.id 
+			 where d.insId=#{insId}
+			<if test="searchText != null">
+				 and (d.vender like CONCAT(CONCAT('%',#{searchText}), '%')
+					 or d.model  like CONCAT(CONCAT('%',#{searchText}), '%') 
+					 or tim.name like CONCAT(CONCAT('%',#{searchText}),'%') 
+					 or d.installDate like binary CONCAT(CONCAT('%',#{searchText}),'%')
+					)
+			</if>
+			order by id desc LIMIT #{start},#{size}
+	</select>
+	
+	
+		<select id="totaldevice" resultType="Integer">
+			SELECT count(1)
+			FROM tdevice d 
+			left join tdevassign de on d.id=de.deviceId
+			left join trainingcar t on de.trainingcarId=t.id 
+			left join TimingTerminalType tim on d.termtype=tim.id 
+			 where d.insId=#{insId}
+			<if test="searchText != null">
+				and (d.vender like CONCAT(CONCAT('%',#{searchText}), '%')
+					 or d.model  like CONCAT(CONCAT('%',#{searchText}), '%') 
+					 or tim.name like CONCAT(CONCAT('%',#{searchText}),'%') 
+					 or d.installDate like binary CONCAT(CONCAT('%',#{searchText}),'%') 
+				)
+			</if>
+	</select>
+	
+	<select id="getCar" resultType="java.util.HashMap">
+		select id as result,licnum as title from TrainingCar where inscode=#{insId}	
+			and licnum like CONCAT(CONCAT('%',#{name}), '%') limit 10
+	</select>
+	
+	<insert id="add" parameterType="com.bjxc.school.Device">
+		insert into tdevice(insId,termtype,vender,model,imei,sn,devnum,`key`,passwd,createdate,isCountry,isProvince,installDate) 
+			value(#{insId},#{termtype},#{vender},#{model},#{imei},#{sn},#{devnum},#{key},#{passwd},now(),1,0,#{installDate})
+	</insert>
+	
+	<update id="update" parameterType="com.bjxc.school.Device">
+		update tdevice 
+		 <set>
+		<if test="termtype != null">
+		    termtype=#{termtype},
+		 </if>
+		 <if test="vender != null">
+		     vender=#{vender},
+		 </if>
+		 <if test="model != null">
+		     model=#{model},
+		 </if>
+		 <if test="imei != null">
+		    imei=#{imei},
+		 </if>
+		 <if test="sn != null">
+		    sn=#{sn},
+		 </if>	
+		 <if test="isProvince != null">
+		    isProvince=#{isProvince},
+		 </if>
+		 <if test="installDate != null">
+		    installDate=#{installDate}
+		 </if>
+		 </set>	
+		 where id=#{id}
+	</update>
+	
+	<delete id="deletes" parameterType="com.bjxc.school.Device">
+		delete from tdevice where id=#{id}
+	</delete>
+	
+	<select id="findLocal" resultType="java.util.Map">
+		select latitude,longtitude from rlocationinfo rt left join traininglog tl on tl.locationinfoid=rt.id left join trainingrecord tr on tr.id=tl.trainingrecordid where tr.deviceid=#{device} order by rt.id desc limit 1
+	</select>
+	
+	<select id="getCarList" resultType="com.bjxc.school.Device">
+		select trca.licnum,tde.devnum,tde.isLogin
+		from trainingcar trca left join tdevassign tsig on tsig.trainingcarId=trca.id
+		left join tdevice tde on tsig.deviceId=tde.id
+		where tde.insId=#{insId} 
+		<if test="searchText!=null">
+			 and trca.licnum like CONCAT(CONCAT('%',#{searchText}), '%')
+		</if>
+		group by trca.id;
+	</select>
+	
+	<select id="getCarByLicNum" resultType="com.bjxc.school.Device">
+		<!-- select * from (
+			select trca.id trcaId,tstu.stunum studentnum,tcoa.coachnum,trca.licnum,tde.id,tde.devnum,rloc.engine_speed engineSpeed,rloc.carSpeed,
+				rloc.`status`,rloc.latitude,rloc.longtitude,rloc.`time` timeStr,tde.isLogin,tsig.sim,tdfi.location
+			from trainingcar trca
+			left join tdevassign tsig on tsig.trainingcarId=trca.id
+			left join tdevice tde on tsig.deviceId=tde.id
+			left join trainingrecord trre on trre.trainingcarId=trca.id
+			left join rlocationinfo rloc on tde.id=rloc.deviceid
+			left join tcoach tcoa on trre.coachid=tcoa.id
+			left join tDrivingField tdfi on tcoa.DrivingFieldID=tdfi.id
+			left join tstudent tstu on tstu.id=trre.studentid
+			where trca.licnum=#{licnum}
+			order by rloc.id desc) A103 
+		group by A103.trcaId; -->
+			select trca.id trcaId,trca.licnum,tde.id,tde.devnum,rloc.engine_speed engineSpeed,rloc.carSpeed,
+				rloc.`status`,rloc.latitude,rloc.longtitude,rloc.`time` timeStr,tde.isLogin,tsig.sim,A103.coachnum,A103.location,A103.stunum studentnum,tsig.sim  
+			from trainingcar trca 
+			left join tdevassign tsig on tsig.trainingcarId=trca.id 
+			left join tdevice tde on tsig.deviceId=tde.id 
+			left join rlocationinfo rloc on tde.id=rloc.deviceid 
+			left join (select trre.trainingcarId,tcoa.coachnum,tdfi.location,tstu.stunum   
+					from trainingrecord trre 
+					left join tcoach tcoa on tcoa.id=trre.coachId 
+					left join tDrivingField tdfi on tcoa.DrivingFieldID=tdfi.id 
+					left join tstudent tstu on tstu.id=trre.studentId 
+					order by trre.id desc limit 1) A103 on A103.trainingcarId=trca.id 
+			where trca.licnum=#{licnum} 
+			order by rloc.id desc limit 1;
+	</select>
+</mapper>

@@ -1,0 +1,216 @@
+@CHARSET "UTF-8";
+/**
+* 茶联平台公用模块
+* @author 扣子（欧雪映）
+*/
+.break-word{word-break:break-all;word-wrap:break-word;}/*长字母或数字自动换行。注意：不能与自动出省略号的样式同时使用*/
+/** 侧栏导航模块 */
+.mod_sidemenu {
+    margin-right: 1px;
+    margin-top: 15px;
+}
+.mod_sidemenu .icon, .mod_sidemenu [class^="icon_"],
+.mod_sidemenu [class*=" icon_"] {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+    vertical-align: middle;
+    font-size: 0;
+    line-height: 0;
+    margin-right: 5px;
+    background: url(img/new_sprite.png) no-repeat;
+}
+.mod_sidemenu .icon_overview {
+    background-position: 0 0;
+}
+.mod_sidemenu .icon_app {
+    background-position:  0 -20px;
+}
+.mod_sidemenu .icon_channel {
+    background-position: 0 -40px;
+}
+.mod_sidemenu .icon_run {
+    background-position: 0 -60px;
+}
+.mod_sidemenu .icon_user {
+    background-position: 0 -80px;
+}
+.mod_sidemenu .icon_setting {
+    background-position: 0 -100px;
+}
+.mod_sidemenu .icon_develop {
+    background-position: 0 -120px;
+}
+.mod_sidemenu .icon_admin {
+    background-position: 0 -140px;
+}
+.mod_sidemenu .icon_netspeed {
+    background-position: 0 -160px;
+}
+.mod_sidemenu .icon_user_active{
+    background-position: 0 -180px
+}
+.mod_sidemenu .icon_dollar{
+    background-position: 0 -200px
+}
+.mod_sidemenu .icon_griblock{
+    background-position: 0 -220px
+}
+.mod_sidemenu .title {
+    position: relative;
+    font-size: 12px;
+    font-weight: bold;
+    text-indent: 24px;
+    color: #000;
+}
+.mod_sidemenu .title a {
+    text-indent: 18px;
+    color: #000;
+    border-left: 6px solid #FFF;
+}
+.mod_sidemenu .title i {
+    margin-right: 7px;
+}
+.mod_sidemenu .title .icon_menu {
+    visibility: hidden;
+    margin-left: 5px;
+    background-position: -60px -60px;
+    cursor: pointer;
+}
+.mod_sidemenu .icon_new {
+    width: 21px;
+    height: 16px;
+    text-indent: -999em;
+    font-size: 0;
+    margin-left: 5px;
+    background-position: -100px -40px;
+}
+.mod_sidemenu.collapsibe .title .icon_menu {
+    background-position: -60px -40px;
+}
+.mod_sidemenu .title:hover .icon_menu,
+.mod_sidemenu.collapsibe .icon_menu {
+    visibility: visible;
+}
+.mod_sidemenu .title,
+.mod_sidemenu .menu_content a {
+    position: relative;
+    z-index: 1;
+    height: 26px;
+    line-height: 26px;
+    color: #000;
+    cursor: pointer;
+}
+.mod_sidemenu .menu_content a {
+    display: block;
+    border-left: 6px solid #FFF;
+}
+.mod_sidemenu .title:hover a,
+.mod_sidemenu li:hover a {
+    color: #000;
+    border-left-color: #6E778A;
+    text-decoration: none;
+    background: #f0f2f3;
+}
+.mod_sidemenu.collapsibe .menu_content {
+    display: none;
+}
+.mod_sidemenu .current,
+.mod_sidemenu .current:hover {
+    background: #F2F4F5;
+    border-top:1px solid #E4E6E9;
+    border-bottom:1px solid #E4E6E9;
+}
+
+.mod_sidemenu a {
+    display: block;
+    padding-left: 41px;
+}
+.mod_sidemenu .title a {
+    padding-left: 0;
+}
+.mod_sidemenu .current a,
+.mod_sidemenu .current:hover a {
+    border-left: 6px solid #3794E3;
+    background: #EDEEF0;
+}
+@media screen and (max-width: 1024px) {
+    .mod_sidemenu  {
+        margin-top: 10px;
+    }
+    .mod_sidemenu .title, .mod_sidemenu .menu_content a {
+        height: 26px;
+        line-height: 26px;
+    }
+}
+
+
+.mod_search_sidebox .sidebox_group{
+	margin-bottom:12px;
+}
+
+.mod_search_sidebox .sidebox_group .input_warp{
+	width:185px;
+	margin-top:5px;
+	height:26px;
+	padding:2px 5px;
+	border:1px solid #c4c4c4;
+	border-radius:2px;
+	background-color:#fff;
+	position:relative;
+}
+
+.mod_search_sidebox .sidebox_group .input_warp input{
+	width:175px;
+	margin:0;
+	padding:0;
+	height:20px;
+	line-height:20px;
+	border:none;
+	outline:none;
+	color:#888;
+}
+
+.mod_basic {
+    *zoom:1;
+}
+
+.mod_basic .content{
+	padding:10px 5px;
+	position: relative;
+    border-top: 0 none;
+    *zoom:1;
+}
+
+.mod_basic > .content .sub_content {
+    position: relative;
+    clear: both;
+    padding: 20px,0px,0px,0px;
+    /*overflow: auto;*/
+    *zoom: 1;
+}
+
+.alert{
+	padding:5px 5px;
+}
+
+/*
+* bootstartp的tab样式做修改
+*/
+
+.mod_basic > .top_header{
+	height:51px;
+	padding:10px 20px;
+	border-bottom:1px solid #DDD;
+}
+
+.mod_basic > .mod_tabs{
+	padding:0px 20px;
+	border-bottom:1px solid #DDD;
+}
+
+.clear-padding{
+	padding:0px 0px;
+}
